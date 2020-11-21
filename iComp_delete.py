@@ -9,6 +9,12 @@ trees = [
                '/var/log/iComp'
                ]
 
+if sys.version_info[0] < 3:
+    sys.stdout.write("Run Script in Python3\n")
+    sys.exit()
+else:
+    pass
+
 sys.stdout.write("removing icomp files\n")
 os.popen('a2dissite iComp.conf')
 try: 
