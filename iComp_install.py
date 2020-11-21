@@ -144,6 +144,7 @@ def copyFiles():
     os.popen('cp ./iCompWebFiles/etc/apache2/sites-available/iComp.conf /etc/apache2/sites-available/iComp.conf')
     os.popen('cp ./iCompSystemFiles/etc/profile.d/iComp.sh /etc/profile.d/iComp.sh')
     os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompApi.service /etc/systemd/system/iCompApi.service')
+    os.popen('cp ./iComp_delete.py /usr/local/lib/iCompetition/')
     os.popen('a2ensite iComp.conf')
     os.popen('systemctl restart apache2')
     os.popen('systemctl daemon-reload')
