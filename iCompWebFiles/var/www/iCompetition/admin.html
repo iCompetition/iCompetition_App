@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Metadata Goes Here -->
+  <title>iComp</title>
+  <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+	<link rel="stylesheet" media="screen and (min-device-width: 500px)" type="text/css" href="css/iComp.css">
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script type="text/javascript" src="js/iComp_sharedVars.js"></script>
+  <script type="text/javascript" src="js/iComp_utils.js"></script>  
+  <script type="text/javascript" src="js/iComp_cookies.js"></script>
+  <script type="text/javascript" src="js/iComp_user.js"></script>
+  <script type="text/javascript" src="js/iComp_adm.js"></script>
+  <title></title>
+</head>
+<body>
+  <!-- Content goes here -->
+  <div class="alert alert-primary alert-dismissible fade show d-none" role="alert" id="dismissibleAlertInfo">
+    <strong id="disAlertInfoMes" >Template</strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <button type="button" class="btn btn-outline-primary btn-sm mb-5" onClick="checkUser();">Return to User Menu</button>
+  <div class="col" >
+    <div class="row">
+      <h3 class="mb-2 mx-auto" >User Functions</h3>
+    </div>
+    <div class="row">
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="adm_listUsers();">List Users</button>
+    </div>                                                        
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="adm_showInfoUserModal();">User Information</button>
+    </div>                                                        
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Delete User</button>
+    </div>                                                        
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Modify Score</button>
+    </div>
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="reviewChgReqs();">Approve Score Change Requests</button>
+    </div>    
+    <div class="row">
+      <h3 class="mt-2 mb-2 mx-auto" >Event Functions</h3>
+    </div>
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="adm_listEvents();">List Events</button>
+    </div>      
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="showModal('CE_modal');">Create Event</button>
+    </div>      
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Edit Event</button>
+    </div>      
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Set Event Live</button>
+    </div>      
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Set Event Hidden</button>
+    </div>      
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Set Event Finished</button>
+    </div>          
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="">Event Detail</button>
+    </div>      
+    <div class="row">                                             
+      <h3 class="mt-2 mb-2 mx-auto" >Server Functions</h3>
+    </div>          
+    <div class="row">                                             
+      <button type="button" class="btn btn-outline-primary btn-lg w-50 mx-auto m-1" onClick="adm_clearTokens();">Clear Auth Tokens</button>
+    </div>      
+      
+    </div>
+  
+  
+  </div>
+  
+  <!-- Simple List Modal -->
+  <div class="modal" tabindex="-1" role="dialog" id="simpleListModal" >
+    <div class="modal-dialog overflow-auto" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="simpleListHeader" >Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body overflow-auto">
+          <table class="table" id="simpleListTable" >
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Simple List Modal -->
+  <!-- Create Event Modal -->
+  <div class="modal" tabindex="-1" role="dialog" id="CE_modal" >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="CE_header" >Create Event</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body overflow-auto">
+        <div class="form-group m-auto w-50">
+          <input type="text" id="ce_ename" placeholder="Event Name" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_sname" placeholder="Enter iRacing Series"required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk1" placeholder="Week 1 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk2" placeholder="Week 2 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk3" placeholder="Week 3 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk4" placeholder="Week 4 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk5" placeholder="Week 5 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk6" placeholder="Week 6 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk7" placeholder="Week 7 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk8" placeholder="Week 8 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk9" placeholder="Week 9 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk10" placeholder="Week 10 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk11" placeholder="Week 11 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk12" placeholder="Week 12 Track" required class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_wk13" placeholder="Week 13 Track - Blank if none" class="form-control w-100 mt-1 mx-auto">
+          <input type="text" id="ce_car" placeholder="Car(s) - Separate by comma" required class="form-control w-100 mt-1 mb-1 mx-auto">
+          <label for="clive">Set Live?</label>
+          <select id="clive">
+            <option value=1>Yes</option>
+            <option value=0>No</option>
+          </select>
+          <button type="submit" class="mt-2 mb-3 btn btn-outline-primary btn-lg w-50" onClick="adm_createEvent();" >Create</button>
+       </div>          
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Create Event Modal -->
+  <!-- Single Entry Modal -->
+    <div class="modal" tabindex="-1" role="dialog" id="SE_modal" >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="SE_header" ></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body overflow-auto">
+        <div class="form-group m-auto w-50">
+          <input type="text" id="se_textbox" placeholder="" required class="form-control w-100 mt-1 mx-auto">
+          <button type="submit" class="mt-2 mb-3 btn btn-outline-primary btn-lg w-50" onClick="adm_singleEntrySubmit();" >Submit</button>
+       </div>          
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- END Single Entry Modal -->
+  
+  
+  
+<script>
+  checkAdminStatus();
+</script>
+</body>
+</html>
