@@ -1,4 +1,0 @@
-/etc/iCompetition
-/usr/local/lib/iCompetition
-/var/www/iCompetition
-/var/log/iComp
