@@ -173,8 +173,8 @@ def buildJSSharedVars():
     httpsPort = input("What is your public facing https port for this server?:  ")
     apiPort   = input("What is your public facing api port for this server?:  ")
     fh = open("./iCompWebFiles/var/www/iCompetition/js/iComp_sharedVars.js",'w')
-    fh.write("apiAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
-    fh.write("htmlAddress = \"" + domain + ":" + apiPort + "/\"\n")
+    fh.write("htmlAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
+    fh.write("apiAddress = \"" + domain + ":" + apiPort + "/\"\n")
     fh.close()
 
 def copyFiles():
