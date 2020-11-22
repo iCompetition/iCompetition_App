@@ -169,10 +169,12 @@ def buildApacheConf():
 
 
 def buildJSSharedVars():
-    domain = input("What is your public facing url for this server?:  ")
+    domain    = input("What is your public facing url for this server?:  ")
+    httpsPort = input("What is your public facing https port for this server?:  ")
+    apiPort   = input("What is your public facing api port for this server?:  ")
     fh = open("./iCompWebFiles/var/www/iCompetition/js/iComp_sharedVars.js",'w')
-    fh.write("apiAddress  = " + domain + ":5000")
-    fh.write("htmlAddress = " + domain + ":8001")
+    fh.write("apiAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
+    fh.write("htmlAddress = \"" + domain + ":" + apiPort + "/\"\n")
     fh.close()
 
 def copyFiles():
@@ -227,13 +229,14 @@ def main():
     CheckPrereq()
     makeiCompDirs()
     buildApacheConf()
+    buildJSSharedVars()
     copyFiles()
     getDbInfo()
     sys.stdout.write('\n\n')
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')
     sys.stdout.write('\t - If this is a brand new installation of iComp, ensure you have completed the DB build.\n')
-    sys.stdout.write('\t\t - See iComp_DB repository')
+    sys.stdout.write('\t\t - See iComp_DB repository\n')
     sys.stdout.write('\t - The iCompApi can be started and stopped with iCompApi-up and iCompApi-down commands (You may need to log out and in first) or by using systemctl\n')
     sys.stdout.write('\t - ensure ports 8001 and 5000 are open on this server.  Ensure database ports are open if database exists on this server.\n')
 
