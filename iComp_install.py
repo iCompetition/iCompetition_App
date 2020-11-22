@@ -141,26 +141,30 @@ def makeiCompDirs():
 def buildApacheConf():
     sys.stdout.write("\n\nHTTPS Info\n\n")
     httpsOn = ""
-    while httpsOn != "y" and https != "n":
+    certLoc = ""
+    keyLoc  = ""
+    while httpsOn != "y" and httpsOn != "n":
         httpsOn = input("Using HTTPS (Recommended) [y/n]: ")
         if httpsOn.lower() != "y" and httpsOn.lower() != "n":
             sys.stdout.write("Invalid response.  [y/n]")
         else:
             pass
-    certLoc = input("Cert Location:  ")
-    keyLoc  = input("Key Location:  ")
+    
+    if httpsOn == "y":
+        certLoc = input("Cert Location:  ")
+        keyLoc  = input("Key Location:  ")
     
     fh = open('./iCompWebFiles/etc/apache2/sites-available/iComp.conf','w')
-    fh.write("<VirtualHost *:8001>")
-    fh.write("\tServerAdmin webmaster@localhost")
-    fh.write("\tDocumentRoot /var/www/iCompetition")
+    fh.write("<VirtualHost *:8001>\n")
+    fh.write("\tServerAdmin webmaster@localhost\n")
+    fh.write("\tDocumentRoot /var/www/iCompetition\n")
     if httpsOn == "y":
-        fh.write("\tSSLEngine on")
-        fh.write("\tSSLCertificateFile    " + certLoc)
-        fh.write("\tSSLCertificateKeyFile " + keyLoc)
-    fh.write("\tErrorLog ${APACHE_LOG_DIR}/error.log")
-    fh.write("\tCustomLog ${APACHE_LOG_DIR}/access.log combined")
-    fh.write(</VirtualHost>)
+        fh.write("\tSSLEngine on\n")
+        fh.write("\tSSLCertificateFile    " + certLoc + "\n")
+        fh.write("\tSSLCertificateKeyFile " + keyLoc + "\n")
+    fh.write("\tErrorLog ${APACHE_LOG_DIR}/error.log\n")
+    fh.write("\tCustomLog ${APACHE_LOG_DIR}/access.log combined\n")
+    fh.write("</VirtualHost>")
     fh.close()
 
 
@@ -225,7 +229,7 @@ def main():
     sys.stdout.write('\t - If this is a brand new installation of iComp, ensure you have completed the DB build.\n')
     sys.stdout.write('\t\t - See iComp_DB repository')
     sys.stdout.write('\t - The iCompApi can be started and stopped with iCompApi-up and iCompApi-down commands (You may need to log out and in first) or by using systemctl\n')
-    sys.stdout.write('\t - ensure ports 8001 and 5000 are open on this server.  Ensure database ports are open if database exists on this server.')
+    sys.stdout.write('\t - ensure ports 8001 and 5000 are open on this server.  Ensure database ports are open if database exists on this server.\n')
 
 if __name__ == '__main__':
     main()
