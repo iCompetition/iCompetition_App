@@ -25,7 +25,7 @@ dirsToCreate   = [
                  '/var/www/iCompetition/images',
                  '/var/log/iComp'
                  ]
-  
+
 def CheckPrereq():
     ##check user
     if getpass.getuser() == 'root':
@@ -137,6 +137,34 @@ def makeiCompDirs():
       except:
           raise
 
+
+def buildApacheConf():
+    sys.stdout.write("\n\nHTTPS Info\n\n")
+    httpsOn = ""
+    while httpsOn != "y" and https != "n":
+        httpsOn = input("Using HTTPS (Recommended) [y/n]: ")
+        if httpsOn.lower() != "y" and httpsOn.lower() != "n":
+            sys.stdout.write("Invalid response.  [y/n]")
+        else:
+            pass
+    certLoc = input("Cert Location:  ")
+    keyLoc  = input("Key Location:  ")
+    
+    fh = open('./iCompWebFiles/etc/apache2/sites-available/iComp.conf','w')
+    fh.write("<VirtualHost *:8001>")
+    fh.write("\tServerAdmin webmaster@localhost")
+    fh.write("\tDocumentRoot /var/www/iCompetition")
+    if httpsOn == "y":
+        fh.write("\tSSLEngine on")
+        fh.write("\tSSLCertificateFile    " + certLoc)
+        fh.write("\tSSLCertificateKeyFile " + keyLoc)
+    fh.write("\tErrorLog ${APACHE_LOG_DIR}/error.log")
+    fh.write("\tCustomLog ${APACHE_LOG_DIR}/access.log combined")
+    fh.write(</VirtualHost>)
+    fh.close()
+
+
+
 def copyFiles():
     sys.stdout.write('\n\nCopying files to system\n\n')
     os.popen('cp ./iCompPythonFiles/usr/local/lib/iCompetition/api/* /usr/local/lib/iCompetition/api/')
@@ -188,6 +216,7 @@ def addAdditionalConfig():
 def main():
     CheckPrereq()
     makeiCompDirs()
+    buildApacheConf()
     copyFiles()
     getDbInfo()
     sys.stdout.write('\n\n')
