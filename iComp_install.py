@@ -11,20 +11,21 @@ import getpass
 import errno
 
 ##Variables
-dirsToCreate = [
-               '/usr/local/lib/iCompetition/api',
-               '/usr/local/lib/iCompetition/python',
-               '/usr/local/lib/iCompetition/python/crypt',
-               '/usr/local/lib/iCompetition/.tokens',
-               '/usr/local/lib/iCompetition/.tokens/.adm',
-               '/usr/local/lib/iCompetition/.tokens/.pwd',
-               '/etc/iCompetition/.creds',
-               '/var/www/iCompetition/css',
-               '/var/www/iCompetition/js',
-               '/var/www/iCompetition/images',
-               '/var/log/iComp'
-               ]
-
+installVersion = '1.01.00'
+dirsToCreate   = [
+                 '/usr/local/lib/iCompetition/api',
+                 '/usr/local/lib/iCompetition/python',
+                 '/usr/local/lib/iCompetition/python/crypt',
+                 '/usr/local/lib/iCompetition/.tokens',
+                 '/usr/local/lib/iCompetition/.tokens/.adm',
+                 '/usr/local/lib/iCompetition/.tokens/.pwd',
+                 '/etc/iCompetition/.creds',
+                 '/var/www/iCompetition/css',
+                 '/var/www/iCompetition/js',
+                 '/var/www/iCompetition/images',
+                 '/var/log/iComp'
+                 ]
+  
 def CheckPrereq():
     ##check user
     if getpass.getuser() == 'root':
@@ -158,12 +159,14 @@ def getDbInfo():
     sys.stdout.write("\n\nDatabase Info\n\n")
     dblocation = input("DB Url or IP Addres:      ")
     dbport     = input("DB Port:                  ")
+    dbname     = input("DB Name:                  ")
     roUser     = getpass.getpass("iCompRead User Password:  ")
     altUser    = getpass.getpass("iCompAlt  User Password:  ")
     
     fh = open('/etc/iCompetition/iComp.conf','w')
-    fh.write('database_location:' + dblocation)
-    fh.write('database_port:' + dbport)
+    fh.write('database_location:' + dblocation + '\n')
+    fh.write('database_port:' + dbport + '\n')
+    fh.write('database_name:' + dbname + '\n')
     fh.close()
 
     pwdRO = iencrypt(roUser)
@@ -176,6 +179,11 @@ def getDbInfo():
     fh.write(pwdALT)
     fh.close()        
   
+def addAdditionalConfig():
+    fh = open('/etc/iCompetition/iComp.conf','a')
+    fh.write('version:' + installVersion)
+    fh.close()
+
 
 def main():
     CheckPrereq()
@@ -183,10 +191,12 @@ def main():
     copyFiles()
     getDbInfo()
     sys.stdout.write('\n\n')
-    sys.stdout.write('iCompetition web application is now installed!\n')
+    sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')
-    sys.stdout.write('\t - If this is a brand new installation of iComp, please create the iComp database using the script found in /usr/local/lib/iCompetition/mysqlCreateDB.sql\n')
+    sys.stdout.write('\t - If this is a brand new installation of iComp, ensure you have completed the DB build.\n')
+    sys.stdout.write('\t\t - See iComp_DB repository')
     sys.stdout.write('\t - The iCompApi can be started and stopped with iCompApi-up and iCompApi-down commands (You may need to log out and in first) or by using systemctl\n')
+    sys.stdout.write('\t - ensure ports 8001 and 5000 are open on this server.  Ensure database ports are open if database exists on this server.')
 
 if __name__ == '__main__':
     main()
