@@ -168,6 +168,12 @@ def buildApacheConf():
     fh.close()
 
 
+def buildJSSharedVars():
+    domain = input("What is your public facing url for this server?:  ")
+    fh = open("./iCompWebFiles/var/www/iCompetition/js/iComp_sharedVars.js",'w')
+    fh.write("apiAddress  = " + domain + ":5000")
+    fh.write("htmlAddress = " + domain + ":8001")
+    fh.close()
 
 def copyFiles():
     sys.stdout.write('\n\nCopying files to system\n\n')
