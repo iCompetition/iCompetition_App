@@ -26,7 +26,7 @@ emailTestCase = "[\w\.][\w\d\.]+@[\w][\w\d]+\.[\w\d]{2,}"
 
 
 def getConf():
-  confDir = []
+  confDir = {}
 
   fh = open("/etc/iCompetition/iComp.conf",'r')
   tmp = fh.readlines()
