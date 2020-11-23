@@ -7,6 +7,7 @@
 ##imports
 import pymysql
 from iComp_util import dbHasher
+from iComp_util import getConf
 
 ##Variables
 dbName = "iComp"            #######PROD DB SET
@@ -16,7 +17,10 @@ dbIp   = 'localhost'        #######PROD DB SET
 roUser = 'iCompRead'
 altUser = 'iCompAlt'
 
-
+##Get db info
+conf   = getConf()
+dbName = conf['datbase_name']
+dbip   = conf['database_location']
 
 def _dbConnect(rw,rights):
   #rw = read/write

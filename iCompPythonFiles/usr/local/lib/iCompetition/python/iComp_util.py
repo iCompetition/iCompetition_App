@@ -24,6 +24,21 @@ pwdToken_ttl = 15
 ##RE Test Cases
 emailTestCase = "[\w\.][\w\d\.]+@[\w][\w\d]+\.[\w\d]{2,}"
 
+
+def getConf():
+  confDir = []
+
+  fh = open("/etc/iCompetition/iComp.conf",'r')
+  tmp = fh.readlines()
+  fh.close()
+
+  for i in range(len(tmp)):
+    conf[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[2].strip()
+  
+  return confDir
+
+
+
 ##valuidate email addr
 def iCompUtils_validateEmail(email):
   testCase = re.compile(emailTestCase)
