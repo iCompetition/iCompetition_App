@@ -360,6 +360,8 @@ def pullEventDetailInfo():
   
   ##Get and present single user schedule info
   scheduleResults = db_pullScheduleResults(en,un,roPwd)
+
+  ##Pull fast time results here and return list as username,week,fastlap ordered by week
   
   scheduleHtml = "<tr>"
   scheduleHtml = scheduleHtml + "<th>Week</th>"
@@ -400,6 +402,7 @@ def pullEventDetailInfo():
       pass
 
     if points in droppedWk:
+      ##HTML for dropped week
       scheduleHtml = scheduleHtml + "<tr class='highlight_grey' >"  
       scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Low score week dropped from total"><i class="fas fa-info-circle"></i></a>  ' + week + '</td>'
       scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -415,6 +418,7 @@ def pullEventDetailInfo():
       scheduleHtml = scheduleHtml + "</tr>"    
       del droppedWk[droppedWk.index(points)]
     else:
+      ##HTML for counted week
       scheduleHtml = scheduleHtml + "<tr>"  
       scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -426,6 +430,7 @@ def pullEventDetailInfo():
         scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
       scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+      ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
       scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
       scheduleHtml = scheduleHtml + "</tr>"  
   
@@ -433,6 +438,12 @@ def pullEventDetailInfo():
   rankingResults = db_pullEventUserRank(en,roPwd)   
   rankingInfo = [] ##[points][string]
   reviewed = []
+
+###if FLB is enable
+## add fastlap to row selection
+## compare fast lap tp fast lap list for each week
+## if numbers match , add 10 points to tmpPoing.append for the week
+
   for row in range(len(rankingResults)):
     tmpPoints = []
     userNum    = rankingResults[row][0]
