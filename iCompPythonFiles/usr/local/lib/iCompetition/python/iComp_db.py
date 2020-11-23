@@ -19,7 +19,7 @@ altUser = 'iCompAlt'
 
 ##Get db info
 conf   = getConf()
-dbName = conf['datbase_name']
+dbName = conf['database_name']
 dbip   = conf['database_location']
 
 def _dbConnect(rw,rights):
