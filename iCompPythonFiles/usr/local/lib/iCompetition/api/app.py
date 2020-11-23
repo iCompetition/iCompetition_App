@@ -635,24 +635,25 @@ def adm_listEvents():
 
 @app.route('/iComp/admin/createEvent', methods=['POST'])
 def adm_createEvent():
-  auth     = request.form['auth']
-  evName   = request.form['en']
-  evSeries = request.form['es']
-  wk1t     = request.form['w1']
-  wk2t     = request.form['w2']
-  wk3t     = request.form['w3']
-  wk4t     = request.form['w4']
-  wk5t     = request.form['w5']
-  wk6t     = request.form['w6']
-  wk7t     = request.form['w7']
-  wk8t     = request.form['w8']
-  wk9t     = request.form['w9']
-  wk10t    = request.form['w10']
-  wk11t    = request.form['w11']
-  wk12t    = request.form['w12']
-  wk13t    = request.form['w13']
-  cars     = request.form['cars']
-  live     = request.form['live']
+  auth         = request.form['auth']
+  evName       = request.form['en']
+  evSeries     = request.form['es']
+  wk1t         = request.form['w1']
+  wk2t         = request.form['w2']
+  wk3t         = request.form['w3']
+  wk4t         = request.form['w4']
+  wk5t         = request.form['w5']
+  wk6t         = request.form['w6']
+  wk7t         = request.form['w7']
+  wk8t         = request.form['w8']
+  wk9t         = request.form['w9']
+  wk10t        = request.form['w10']
+  wk11t        = request.form['w11']
+  wk12t        = request.form['w12']
+  wk13t        = request.form['w13']
+  cars         = request.form['cars']
+  live         = request.form['live']
+  fastLapBonus = request.form['fastLapBonus']
   w13 = False
   if validateAdmToken(auth):
     if wk13t.lower() != "norace":
@@ -673,7 +674,7 @@ def adm_createEvent():
                  '13' : wk13t
                }
     try:
-      db_createEvent(evName,evSeries,wkTracks,w13,cars,live,altPwd)
+      db_createEvent(evName,evSeries,wkTracks,w13,cars,live,altPwd,fastLapBonus)
       return json.dumps({'result':True})
     except Exception as e:
       return json.dumps({'result':False,'message':str(e)})    

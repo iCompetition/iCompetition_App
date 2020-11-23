@@ -311,7 +311,7 @@ def db_listEvents(rights):
   return results  
 
 
-def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights):
+def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus):
   eNum = 0
   carList = cars.split(",")
   db = _dbConnect("write",rights)
@@ -322,7 +322,7 @@ def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights):
     eventNum = 1
   else:
     eventNum = (result[0][0] + 1)  
-  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + ");")
+  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + "," + str(fastLapBonus) + ");")
   cr.execute("insert into schedule values (" + str(eventNum) + ",1,'"  + wkTracks['1'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",2,'"  + wkTracks['2'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",3,'"  + wkTracks['3'] + "');")
