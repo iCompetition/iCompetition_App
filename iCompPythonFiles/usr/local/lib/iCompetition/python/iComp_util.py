@@ -33,7 +33,7 @@ def getConf():
   fh.close()
 
   for i in range(len(tmp)):
-    conf[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[2].strip()
+    confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip()
   
   return confDir
 
