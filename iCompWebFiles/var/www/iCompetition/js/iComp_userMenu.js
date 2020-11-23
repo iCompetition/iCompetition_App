@@ -132,10 +132,12 @@ function enableScoreInputs(){
     document.getElementById("score_position").disabled = false;
     document.getElementById("score_points").disabled = false;
     document.getElementById("score_inc").disabled = false;
+    document.getElementById("score_lap").disabled = false;
   }else{
     document.getElementById("score_position").disabled = true;
     document.getElementById("score_points").disabled = true;
     document.getElementById("score_inc").disabled = true;
+    document.getElementById("score_lap").disabled = true;
   }
 }
   
