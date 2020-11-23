@@ -10,17 +10,13 @@ from iComp_util import dbHasher
 from iComp_util import getConf
 
 ##Variables
-dbName = "iComp"            #######PROD DB SET
-dbIp   = 'localhost'        #######PROD DB SET
-##dbName = "iComp_dev"     #######DEV DB SET
-##dbIp   = '192.168.1.81'  #######DEV DB SET
 roUser = 'iCompRead'
 altUser = 'iCompAlt'
 
 ##Get db info
 conf   = getConf()
 dbName = conf['database_name']
-dbip   = conf['database_location']
+dbIp   = conf['database_location']
 
 def _dbConnect(rw,rights):
   #rw = read/write
