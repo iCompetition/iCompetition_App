@@ -150,10 +150,11 @@ function logScore(){
   pos = document.getElementById("score_position").value;
   pnt = document.getElementById("score_points").value;
   inc = document.getElementById("score_inc").value;
+  lap = document.getElementById("score_lap").value;
   un  = getCookie("userNum");
   
   const call = new XMLHttpRequest(),
-  url = apiAddress + "iComp/events/logScore?userNum=" + un + "&eventNum=" + en + "&wkNum=" + wn + "&pos=" + pos + "&pnt=" + pnt + "&inc=" + inc + "&token=" + getCookie("auth");
+  url = apiAddress + "iComp/events/logScore?userNum=" + un + "&eventNum=" + en + "&wkNum=" + wn + "&pos=" + pos + "&pnt=" + pnt + "&inc=" + inc + "&lap=" + lap + "&token=" + getCookie("auth");
   call.open("GET",url,false);
   call.send(null);
   response = JSON.parse(call.responseText);
@@ -171,6 +172,7 @@ function logScore(){
   document.getElementById("score_position").value = "";
   document.getElementById("score_points").value = "";
   document.getElementById("score_inc").value = "";  
+  document.getElementById("score_lap").value = "";  
   wSel.innerHTML.value = "";
   wkSel.disabled = true; 
   
