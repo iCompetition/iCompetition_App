@@ -367,6 +367,7 @@ def pullEventDetailInfo():
   scheduleHtml = scheduleHtml + "<th>Position</th>"
   scheduleHtml = scheduleHtml + "<th>Points</th>"
   scheduleHtml = scheduleHtml + "<th>Inc</th>"
+  scheduleHtml = scheduleHtml + "<th>Fast Lap</th>"
   scheduleHtml = scheduleHtml + "</tr>"
   droppedWk = []
   wkScore  = []
@@ -390,7 +391,14 @@ def pullEventDetailInfo():
     points   = str(scheduleResults[row][3])
     inc      = str(scheduleResults[row][4])
     chgReq   = str(scheduleResults[row][5])
+    fastLap  = str(scheduleResults[row][6])
     
+    ##check for null fastlap
+    if fastLap == "" or fastLap == 0 or fastLap is None:
+      fastLap = "X.XX.XXX"
+    else:
+      pass
+
     if points in droppedWk:
       scheduleHtml = scheduleHtml + "<tr class='highlight_grey' >"  
       scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Low score week dropped from total"><i class="fas fa-info-circle"></i></a>  ' + week + '</td>'
@@ -403,6 +411,7 @@ def pullEventDetailInfo():
         scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
       scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+      scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
       scheduleHtml = scheduleHtml + "</tr>"    
       del droppedWk[droppedWk.index(points)]
     else:
@@ -417,6 +426,7 @@ def pullEventDetailInfo():
         scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
       scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+      scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
       scheduleHtml = scheduleHtml + "</tr>"  
   
   ## get and review ranking info

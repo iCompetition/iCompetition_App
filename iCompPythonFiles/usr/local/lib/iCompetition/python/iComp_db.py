@@ -276,7 +276,7 @@ def db_pullEventUserRank(eventNum,rights):
 
 def db_pullScheduleResults(eventNum,userNum,rights):
   scheduleQuery = """
-    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested
+    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested, sc.fastLap
       from schedule sch 
         left join scoring sc 
           on sch.week = sc.week
