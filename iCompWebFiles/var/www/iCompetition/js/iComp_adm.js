@@ -92,6 +92,7 @@ function adm_createEvent(){
   liveSel = document.getElementById("clive");
   live = liveSel.options[liveSel.selectedIndex].value;
   cars = document.getElementById("ce_car").value;  
+  setFLB = document.getElementById("flb");
   
   if (w13 == ""){
     w13 = "norace";
@@ -101,7 +102,7 @@ function adm_createEvent(){
   url = apiAddress + "/iComp/admin/createEvent";
   xhttp.open("POST",url,false);
   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhttp.send("auth=" + getCookie("atok") + "&en=" + en + "&es=" + es + "&w1=" + w1 + "&w2=" + w2 + "&w3=" + w3 + "&w4=" + w4 + "&w5=" + w5 + "&w6=" + w6 + "&w7=" + w7 + "&w8=" + w8 + "&w9=" + w9 + "&w10="  + w10 + "&w11=" + w11 + "&w12=" + w12 + "&w13=" + w13 + "&live=" + live + "&cars=" + cars);
+  xhttp.send("auth=" + getCookie("atok") + "&en=" + en + "&es=" + es + "&w1=" + w1 + "&w2=" + w2 + "&w3=" + w3 + "&w4=" + w4 + "&w5=" + w5 + "&w6=" + w6 + "&w7=" + w7 + "&w8=" + w8 + "&w9=" + w9 + "&w10="  + w10 + "&w11=" + w11 + "&w12=" + w12 + "&w13=" + w13 + "&live=" + live + "&cars=" + cars + "&fastLapBonus=" + flb);
   response = JSON.parse(xhttp.responseText);  
   
   if (response.result == true){
