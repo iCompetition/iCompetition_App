@@ -246,7 +246,7 @@ def db_getEventBaseInfo(eventNum,rights):
 def db_pullEventFastLaps(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select weekNum, laptime from event where eventNum = " + str(eventNum) + " order by weekNum;")
+  cr.execute("select weekNum, laptime from event where topLap = " + str(eventNum) + " order by weekNum;")
   results = cr.fetchall()
   _dbClose(db,cr)
   return results  
