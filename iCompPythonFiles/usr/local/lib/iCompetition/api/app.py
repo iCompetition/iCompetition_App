@@ -50,7 +50,7 @@ apiLog.info("Starting iCompAPI")
 dbSchema = db_schemaVersion(roPwd)
 majorVer = confDict['version'].split('.')[0] + '.' +confDict['version'].split('.')[1]
 apiLog.info("DBSchema Version: " + str(dbSchema))
-if  majorVer >= dbSchema:
+if  majorVer > dbSchema:
   apiLog.error("DB Schema is too low for this version of iCompetition.  Please Update DB Schema to at least version " + majorVer)
   sys.exit(0)
 else:
