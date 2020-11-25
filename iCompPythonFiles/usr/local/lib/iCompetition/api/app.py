@@ -487,6 +487,7 @@ def pullEventDetailInfo():
 
   for row in range(len(rankingResults)):
     tmpPoints = []
+    bonus      = 0
     userNum    = rankingResults[row][0]
     userFirst  = rankingResults[row][1]
     userLast   = rankingResults[row][2]
@@ -494,15 +495,21 @@ def pullEventDetailInfo():
     fastLap    = rankingResults[row][6]
     if userNum not in reviewed:
       reviewed.append(userNum)
+      userFL = db_pullEventFastLapsForUser(en,userNum,roPwd)
       for row2 in range(len(rankingResults)):
         if rankingResults[row2][0] == userNum:
-          if fastLapEnabled and row < len(eventFastLabTimes):
-            if str(fastLap) == eventFastLabTimes[row][1]:
-              tmpPoints.append(rankingResults[row2][4] + fl_bonus)
+          tmpPoints.append(rankingResults[row2][4])
+        if fastLapEnabled:
+          for i in range(len(userFL)):
+            if row2 < len(eventFastLabTimes):
+              if str(userFL[i][1]).strip() == str(eventFastLabTimes[i][1]).strip():
+                bonus = bonus + fl_bonus
+              else:
+                pass
             else:
-              tmpPoints.append(rankingResults[row2][4])
-          else:
-            tmpPoints.append(rankingResults[row2][4])
+              pass
+        else:
+          pass
       tmpPoints.sort()
       if len(tmpPoints) == 13:
         del tmpPoints[:5]
@@ -516,7 +523,7 @@ def pullEventDetailInfo():
         del tmpPoints[:1]
       else:
         pass
-      pointSum = sum(tmpPoints)
+      pointSum = sum(tmpPoints) + bonus
       rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
   
   rankingInfo.sort(reverse=True)

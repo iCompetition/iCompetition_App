@@ -253,6 +253,15 @@ def db_pullEventFastLaps(eventNum,rights):
   return results  
 
 
+def db_pullEventFastLapsForUser(eventNum,userNum,rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor()  
+  cr.execute("select weekNum, min(laptime) from topLap where eventNum = " + str(eventNum) + " and userNum = " + str(userNum) + " group by weekNum order by weekNum;")
+  results = cr.fetchall()
+  _dbClose(db,cr)
+  return results  
+
+
 def db_getEventParticipants(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
