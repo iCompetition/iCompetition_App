@@ -442,10 +442,10 @@ def pullEventDetailInfo():
             scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
           else:
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
-          scheduleHtml = scheduleHtml + "</tr>"  
+            scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+            scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+            scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+            scheduleHtml = scheduleHtml + "</tr>"  
         else:
           scheduleHtml = scheduleHtml + "<tr>"  
           scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
