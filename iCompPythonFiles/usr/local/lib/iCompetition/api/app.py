@@ -407,7 +407,7 @@ def pullEventDetailInfo():
     inc      = str(scheduleResults[row][4])
     chgReq   = str(scheduleResults[row][5])
     fastLap  = str(scheduleResults[row][6])
-    
+    fastLap_reformed = fastLap
     ##check for null fastlap
     if fastLap == "" or fastLap == 0 or fastLap is None:
       fastLap = "X.XX.XXX"
@@ -415,8 +415,8 @@ def pullEventDetailInfo():
       pass
 
     ##check for sub 1.00.000 fastlap
-    if fastLap.split('.')[0] == 0
-      fastLap = fastLap.split('.')[1] + "." + fastLap.split('.')[2]
+    if fastLap.split('.')[0] == 0:
+      fastLap_reformed = fastLap.split('.')[1] + "." + fastLap.split('.')[2]
     else:
       pass
 
@@ -433,7 +433,7 @@ def pullEventDetailInfo():
         scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
       scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-      scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+      scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
       scheduleHtml = scheduleHtml + "</tr>"    
       del droppedWk[droppedWk.index(points)]
     else:
@@ -452,7 +452,7 @@ def pullEventDetailInfo():
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"  
         else:
           scheduleHtml = scheduleHtml + "<tr>"  
@@ -466,7 +466,7 @@ def pullEventDetailInfo():
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"  
       else:
         scheduleHtml = scheduleHtml + "<tr>"  
@@ -480,7 +480,7 @@ def pullEventDetailInfo():
           scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
         scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
         scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+        scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
         scheduleHtml = scheduleHtml + "</tr>"          
 
   ## get and review ranking info
@@ -527,8 +527,11 @@ def pullEventDetailInfo():
           for j in range(len(userFL)):
             try:
               if eventFastLabTimes[i][1] == userFL[i][1]:
-                bonus = bonus + fl_bonus
-                break
+                if i < 9:
+                  bonus = bonus + fl_bonus
+                  break
+                else:
+                  pass
             except IndexError:
               pass
 
