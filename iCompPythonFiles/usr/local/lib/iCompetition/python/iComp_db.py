@@ -237,7 +237,7 @@ def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,rights):
 def db_getEventBaseInfo(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select name, series, enableFastLabBonus from event where eventNum = " + str(eventNum) + ";")
+  cr.execute("select name, series, enableFastLapBonus from event where eventNum = " + str(eventNum) + ";")
   results = cr.fetchone()
   _dbClose(db,cr)
   return results
