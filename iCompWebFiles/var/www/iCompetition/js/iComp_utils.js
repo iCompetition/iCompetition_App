@@ -63,7 +63,7 @@ function getVersionInfo(){
     
     call.onload = function(){
                          response = JSON.parse(call.responseText);
-                         toolTipText = "Presentation: " + String(response.presentation) + " -- Python: " + String(response.python) + " -- Api: " + String(response.api);
+                         toolTipText = "iCompetition " + response.version 
                          document.getElementById("versionTooltip").title = toolTipText; 
     }
     call.send(null);

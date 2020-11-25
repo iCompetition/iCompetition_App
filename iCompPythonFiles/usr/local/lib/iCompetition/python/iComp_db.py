@@ -37,6 +37,17 @@ def _dbClose(db, cr):
   db.close()
 
 
+def db_schemaVersion(rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor()
+  ##get the hashed user password and compare to provided one
+  cr.execute("select version from iComp_schema;")
+  result = cr.fetchone()
+  _dbClose(db, cr)  
+  return result[0]
+
+
+
 def db_authAdminStatus(userName, rights):
   ##check username for admin status
   db = _dbConnect("read",rights)

@@ -23,8 +23,6 @@ formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',date
 logHandler.setFormatter(formatter)
 apiLog.addHandler(logHandler)
 
-apiLog.info("Init iCompAPI")
-
 ##pathing check
 ensureTokenDirsExist()
 
@@ -38,22 +36,32 @@ CORS(app)
 hostIP = '0.0.0.0'
 portNum = 5001
 
+apiLog.info("iCompetition " + confDict['version'])
+apiLog.info("Init iCompAPI")
 apiLog.info("HostIP: " + hostIP)
 apiLog.info("HostPort:" + str(portNum))
-
 apiLog.info("Gathering DB account information")
 roPwd = idecrypt(getCred("iCompRead"))
 altPwd = idecrypt(getCred("iCompAlt"))
 apiLog.info("Complete")
 apiLog.info("Starting iCompAPI")
 
+##Schema check
+dbSchema = db_schemaVersion(roPwd)
+majorVer = confDict['version'].split('.')[0] + '.' +confDict['version'].split('.')[1]
+apiLog.info("DBSchema Version: " + str(dbSchema))
+if  majorVer >= dbSchema:
+  apiLog.error("DB Schema is too low for this version of iCompetition.  Please Update DB Schema to at least version " + majorVer)
+  sys.exit(0)
+else:
+  pass
+
 """
 Safe Util Endpoints
 """
 @app.route('/iComp/version', methods=['GET'])
 def sendVersionInfo():
-  vInfo = getVersionInformation()
-  return json.dumps({'presentation' : vInfo['presentation'],'api' : vInfo['api'],'python' : vInfo['python']})
+  return json.dumps({'version' : confDict['version']})
 
 
 
