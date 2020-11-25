@@ -231,6 +231,7 @@ def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,rights):
   db = _dbConnect("write",rights)
   cr = db.cursor()   
   cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0,'" + lap + "');")
+  cr.execute("insert into topLap values(" + eventNum + "," + wkNum + "," + userName + ",'" + lap + "');")
   _dbClose(db,cr)
 
 
