@@ -433,7 +433,7 @@ def pullEventDetailInfo():
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
       if fastLapEnabled and row < len(eventFastLabTimes):
         if fastLap == eventFastLabTimes[row][1]:
-          scheduleHtml = scheduleHtml + "<tr class='highlight_green>"  
+          scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap Bonus Applied For This Week"><i class="fas fa-stopwatch"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
           if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
@@ -442,10 +442,10 @@ def pullEventDetailInfo():
             scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
           else:
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-            scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-            scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-            scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
-            scheduleHtml = scheduleHtml + "</tr>"  
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"  
         else:
           scheduleHtml = scheduleHtml + "<tr>"  
           scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
@@ -474,7 +474,7 @@ def pullEventDetailInfo():
         scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
         scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
         scheduleHtml = scheduleHtml + "</tr>"          
-  
+
   ## get and review ranking info
   rankingResults = db_pullEventUserRank(en,roPwd)   
   rankingInfo = [] ##[points][string]
@@ -539,7 +539,6 @@ def pullEventDetailInfo():
     rankingHTML = rankingHTML  + "<td>" + str(points) + "</td>"
     rankingHTML = rankingHTML  + "</tr>"
 
-  
   ##fill user results dropdown
   userSelDropDownHtml = []
   userPar = db_getEventParticipants(en,roPwd)
