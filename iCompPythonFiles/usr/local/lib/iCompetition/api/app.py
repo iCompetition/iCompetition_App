@@ -432,7 +432,7 @@ def pullEventDetailInfo():
       ##HTML for counted week
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
       if fastLapEnabled:
-        if fastLap == eventFastLabTimes[row][1] and row <= len(eventFastLabTimes):
+        if fastLap == eventFastLabTimes[row][1] and row < len(eventFastLabTimes):
           scheduleHtml = scheduleHtml + "<tr class='highlight_green>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap Bonus Applied For This Week"><i class="fas fa-stopwatch"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -497,7 +497,7 @@ def pullEventDetailInfo():
       for row2 in range(len(rankingResults)):
         if rankingResults[row2][0] == userNum:
           if fastLapEnabled:
-            if str(fastLap) == eventFastLabTimes[row][1] and row <= len(eventFastLabTimes):
+            if str(fastLap) == eventFastLabTimes[row][1] and row < len(eventFastLabTimes):
               tmpPoints.append(rankingResults[row2][4] + fl_bonus)
             else:
               tmpPoints.append(rankingResults[row2][4])
