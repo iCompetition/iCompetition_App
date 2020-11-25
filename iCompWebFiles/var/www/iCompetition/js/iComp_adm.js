@@ -92,7 +92,7 @@ function adm_createEvent(){
   liveSel = document.getElementById("clive");
   live = liveSel.options[liveSel.selectedIndex].value;
   cars = document.getElementById("ce_car").value;  
-  setFLB = document.getElementById("flb");
+  setFLB = document.getElementById("flb").value;
   
   if (w13 == ""){
     w13 = "norace";
