@@ -28,6 +28,10 @@ apiLog.info("Init iCompAPI")
 ##pathing check
 ensureTokenDirsExist()
 
+##config setup
+confDict = getConf()
+fl_bonus = confDict['fastLabBonusAmount']
+
 ##Host Run Info Variables
 app = Flask(__name__)
 CORS(app)
@@ -337,10 +341,11 @@ def logScoreForWeek():
   pos = parser['pos']
   pnt = parser['pnt']
   inc = parser['inc']
+  lap = parser['lap']
   t = parser['token']
   if validateToken(t):      
     try:
-      db_logScore(un,en,wn,pos,pnt,inc,altPwd)
+      db_logScore(un,en,wn,pos,pnt,inc,lap,altPwd)
       return json.dumps({'result':True})
     except Exception as e:
       return json.dumps({'result':False,'message':str(e)})
@@ -358,11 +363,17 @@ def pullEventDetailInfo():
   ##Get base event info
   eventBaseInfo = db_getEventBaseInfo(en,roPwd)
   
+  ##Set FLB enabled/disabled
+  fastLapEnabled = False
+  if str(eventBaseInfo[2]) == "1":
+    fastLapEnabled = True
+    
   ##Get and present single user schedule info
   scheduleResults = db_pullScheduleResults(en,un,roPwd)
 
   ##Pull fast time results here and return list as username,week,fastlap ordered by week
-  
+  eventFastLabTimes = db_pullEventFastLaps(en,roPwd)
+
   scheduleHtml = "<tr>"
   scheduleHtml = scheduleHtml + "<th>Week</th>"
   scheduleHtml = scheduleHtml + "<th>Track</th>"
@@ -419,20 +430,50 @@ def pullEventDetailInfo():
       del droppedWk[droppedWk.index(points)]
     else:
       ##HTML for counted week
-      scheduleHtml = scheduleHtml + "<tr>"  
-      scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
-      scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-      if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
-        scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-      elif position != '' and un.strip() == curUn.strip():
-        scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
-      else:
-        scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-      scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-      scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
-      scheduleHtml = scheduleHtml + "</tr>"  
+      if fastLapEnabled:
+        if fastLap == eventFastLabTimes[week][1]:
+          scheduleHtml = scheduleHtml + "<tr class='highlight_green>"  
+          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap Bonus Applied For This Week"><i class="fas fa-stopwatch"></i></a>  ' + week + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and un.strip() == curUn.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"  
+        else:
+          scheduleHtml = scheduleHtml + "<tr>"  
+          scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and un.strip() == curUn.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"  
+      else:
+        scheduleHtml = scheduleHtml + "<tr>"  
+        scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
+        scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+        if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
+          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+        elif position != '' and un.strip() == curUn.strip():
+          scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
+        else:
+          scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+        scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+        scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+        scheduleHtml = scheduleHtml + "<td>" + fastLap      + "</td>"
+        scheduleHtml = scheduleHtml + "</tr>"          
   
   ## get and review ranking info
   rankingResults = db_pullEventUserRank(en,roPwd)   
@@ -450,11 +491,18 @@ def pullEventDetailInfo():
     userFirst  = rankingResults[row][1]
     userLast   = rankingResults[row][2]
     userCar    = rankingResults[row][3]
+    fastLap    = rankingResults[row][6]
     if userNum not in reviewed:
       reviewed.append(userNum)
       for row2 in range(len(rankingResults)):
         if rankingResults[row2][0] == userNum:
-          tmpPoints.append(rankingResults[row2][4])
+          if fastLapEnabled:
+            if str(fastLap) == eventFastLabTimes[week][1]:
+              tmpPoints.append(rankingResults[row2][4] + fl_bonus)
+            else:
+              tmpPoints.append(rankingResults[row2][4])
+          else:
+            tmpPoints.append(rankingResults[row2][4])
       tmpPoints.sort()
       if len(tmpPoints) == 13:
         del tmpPoints[:5]

@@ -222,6 +222,7 @@ def getDbInfo():
 def addAdditionalConfig():
     fh = open('/etc/iCompetition/iComp.conf','a')
     fh.write('version:' + installVersion)
+    fh.write('fastLapBonusAmount:10')
     fh.close()
 
 

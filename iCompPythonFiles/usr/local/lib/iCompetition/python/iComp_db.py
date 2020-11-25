@@ -227,20 +227,29 @@ def db_getEventScheduleWeeks(eventNum,userNum,rights):
   return results  
 
 
-def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,rights):
+def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,rights):
   db = _dbConnect("write",rights)
   cr = db.cursor()   
-  cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0);")
+  cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0," + lap + ");")
   _dbClose(db,cr)
 
 
 def db_getEventBaseInfo(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select name, series from event where eventNum = " + str(eventNum) + ";")
+  cr.execute("select name, series, enableFastLabBonus from event where eventNum = " + str(eventNum) + ";")
   results = cr.fetchone()
   _dbClose(db,cr)
   return results
+
+
+def db_pullEventFastLaps(eventNum,rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor()  
+  cr.execute("select weekNum, laptime from event where eventNum = " + str(eventNum) + " sort by weekNum;")
+  results = cr.fetchall()
+  _dbClose(db,cr)
+  return results  
 
 
 def db_getEventParticipants(eventNum,rights):
@@ -254,7 +263,7 @@ def db_getEventParticipants(eventNum,rights):
 
 def db_pullEventUserRank(eventNum,rights):
   userRankQuery = """
-    select p.userNum, u.firstName, u.lastName, p.vehicle, sc.points, u.userName
+    select p.userNum, u.firstName, u.lastName, p.vehicle, sc.points, u.userName, sc.fastLap
     from participants p
     join scoring sc on p.userNum = sc.userNum
     join users u on sc.userNum = u.userNum
