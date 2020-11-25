@@ -36,15 +36,12 @@ CORS(app)
 hostIP = '0.0.0.0'
 portNum = 5001
 
-apiLog.info("iCompetition " + confDict['version'])
-apiLog.info("Init iCompAPI")
+apiLog.info("Init iCompAPI - iCompetition " + confDict['version'])
 apiLog.info("HostIP: " + hostIP)
 apiLog.info("HostPort:" + str(portNum))
 apiLog.info("Gathering DB account information")
 roPwd = idecrypt(getCred("iCompRead"))
 altPwd = idecrypt(getCred("iCompAlt"))
-apiLog.info("Complete")
-apiLog.info("Starting iCompAPI")
 
 ##Schema check
 dbSchema = db_schemaVersion(roPwd)
@@ -55,6 +52,8 @@ if  majorVer > dbSchema:
   sys.exit(0)
 else:
   pass
+  apiLog.info("Complete")
+  apiLog.info("Starting iCompAPI")
 
 """
 Safe Util Endpoints
