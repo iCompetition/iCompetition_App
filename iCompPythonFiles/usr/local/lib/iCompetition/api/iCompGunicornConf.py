@@ -1,3 +1,3 @@
-accesslog = '/var/log/iComp/api.log'
-errorlog  = '/var/log/iComp/api.log'
+accesslog = '/var/log/iComp/gunicorn.log'
+errorlog  = '/var/log/iComp/gunicorn.log'
 
