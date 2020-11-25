@@ -345,7 +345,7 @@ def logScoreForWeek():
   t = parser['token']
   if validateToken(t):      
     try:
-      if len(lap).split('.') == 2:
+      if len(lap.split('.')) == 2:
         lap = "0." + lap
       db_logScore(un,en,wn,pos,pnt,inc,lap,altPwd)
       return json.dumps({'result':True})
@@ -415,7 +415,7 @@ def pullEventDetailInfo():
       pass
 
     ##check for sub 1.00.000 fastlap
-    if fastLap.split('.')[0] == 0:
+    if fastLap.split('.')[0] == "0":
       fastLap_reformed = fastLap.split('.')[1] + "." + fastLap.split('.')[2]
     else:
       pass
