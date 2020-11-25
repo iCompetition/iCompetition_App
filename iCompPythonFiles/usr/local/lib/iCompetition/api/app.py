@@ -345,6 +345,8 @@ def logScoreForWeek():
   t = parser['token']
   if validateToken(t):      
     try:
+      if len(lap).split('.') == 2:
+        lap = "0." + lap
       db_logScore(un,en,wn,pos,pnt,inc,lap,altPwd)
       return json.dumps({'result':True})
     except Exception as e:
@@ -409,6 +411,12 @@ def pullEventDetailInfo():
     ##check for null fastlap
     if fastLap == "" or fastLap == 0 or fastLap is None:
       fastLap = "X.XX.XXX"
+    else:
+      pass
+
+    ##check for sub 1.00.000 fastlap
+    if fastLap.split('.')[0] == 0
+      fastLap = fastLap.split('.')[1] + "." + fastLap.split('.')[2]
     else:
       pass
 
@@ -486,7 +494,7 @@ def pullEventDetailInfo():
 ## if numbers match , add 10 points to tmpPoing.append for the week
 
   for row in range(len(rankingResults)):
-    tmpPoints = []
+    tmpPoints  = []
     bonus      = 0
     userNum    = rankingResults[row][0]
     userFirst  = rankingResults[row][1]
@@ -495,21 +503,9 @@ def pullEventDetailInfo():
     fastLap    = rankingResults[row][6]
     if userNum not in reviewed:
       reviewed.append(userNum)
-      userFL = db_pullEventFastLapsForUser(en,userNum,roPwd)
       for row2 in range(len(rankingResults)):
         if rankingResults[row2][0] == userNum:
           tmpPoints.append(rankingResults[row2][4])
-        if fastLapEnabled:
-          for i in range(len(userFL)):
-            if row2 < len(eventFastLabTimes):
-              if str(userFL[i][1]).strip() == str(eventFastLabTimes[i][1]).strip():
-                bonus = bonus + fl_bonus
-              else:
-                pass
-            else:
-              pass
-        else:
-          pass
       tmpPoints.sort()
       if len(tmpPoints) == 13:
         del tmpPoints[:5]
@@ -523,6 +519,19 @@ def pullEventDetailInfo():
         del tmpPoints[:1]
       else:
         pass
+
+      if fastLapEnabled:
+        bonus = 0
+        userFL = db_pullEventFastLapsForUser(en,userNum,roPwd)
+        for i in range(len(eventFastLabTimes)):
+          for j in range(len(userFL)):
+            try:
+              if eventFastLabTimes[i][1] == userFL[i][1]:
+                bonus = bonus + fl_bonus
+                break
+            except IndexError:
+              pass
+
       pointSum = sum(tmpPoints) + bonus
       rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
   
