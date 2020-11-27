@@ -74,7 +74,7 @@ def sendPassResetEmail(email, userName, token):
   message['Subject'] = "iCompetition Password Change Request"
   message.attach(MIMEText(mail_content, 'html'))
   #session = smtplib.SMTP('smtp.gmail.com', 587)
-  session = smtplib.STMP(conf['sendEmailDomain'],conf['sendEmailPort'])
+  session = smtplib.SMTP(conf['sendEmailDomain'],conf['sendEmailPort'])
   session.starttls()
   session.login(sendEmail, sendPass)
   text = message.as_string()
