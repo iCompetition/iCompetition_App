@@ -34,7 +34,10 @@ def getConf():
 
   for i in range(len(tmp)):
     if (tmp)[i].strip()[:1] != "#" and (tmp)[i].strip()[:1] != " ":
-      confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip()
+      if len(tmp[i].split(":")) == 4:
+        confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip() + ":" + tmp[i].split(':')[2].strip() + ":" + tmp[i].split(':')[3].strip()
+      else:
+        confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip()
     else:
       pass
   
@@ -67,7 +70,7 @@ def sendPassResetEmail(email, userName, token):
   #sendEmail = "noReply.iComp@gmail.com"
   #sendPass = "UNKtMS5fWrm6gvnpGQfI"
   sendEmail = conf['sendEmailAddr']
-  sendPAss  = conf['sendEmailPass']
+  sendPass  = conf['sendEmailPass']
   message = MIMEMultipart()
   message['From'] = sendEmail
   message['To']   = email
