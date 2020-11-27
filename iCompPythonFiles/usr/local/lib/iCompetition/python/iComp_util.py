@@ -33,7 +33,10 @@ def getConf():
   fh.close()
 
   for i in range(len(tmp)):
-    confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip()
+    if (tmp)[i].strip()[:1] != "#" and (tmp)[i].strip()[:1] != " ":
+      confDir[tmp[i].split(':')[0].strip()] = tmp[i].split(':')[1].strip()
+    else:
+      pass
   
   return confDir
 
@@ -50,23 +53,28 @@ def iCompUtils_validateEmail(email):
 
 ##password reset email
 def sendPassResetEmail(email, userName, token):
+  conf   = getConf()
+  domain = conf['emailDomain']
   mail_content = """
                  <html><head></head>
                    <body>
                     <p>You have requested to reset your password for iCompetition for UserName: """ + userName + """.
                        Click the link below to reset. </p>
-                       <p><a href='https://toastysilverfish.site:8002/resetPass.html?userName=""" + userName + """&validation=""" + token + """' >Reset Password</a></p>
+                       <p><a href='""" + domain + """ + /resetPass.html?userName=""" + userName + """&validation=""" + token + """' >Reset Password</a></p>
                    </body>
                  </html>
                  """                       
-  sendEmail = "noReply.iComp@gmail.com"
-  sendPass = "UNKtMS5fWrm6gvnpGQfI"
+  #sendEmail = "noReply.iComp@gmail.com"
+  #sendPass = "UNKtMS5fWrm6gvnpGQfI"
+  sendEmail = conf['sendEmailAddr']
+  sendPAss  = conf['sendEmailPass']
   message = MIMEMultipart()
   message['From'] = sendEmail
   message['To']   = email
   message['Subject'] = "iCompetition Password Change Request"
   message.attach(MIMEText(mail_content, 'html'))
-  session = smtplib.SMTP('smtp.gmail.com', 587)
+  #session = smtplib.SMTP('smtp.gmail.com', 587)
+  session = smtplib.STMP(conf['sendEmailDomain'],conf['sendEmailPort'])
   session.starttls()
   session.login(sendEmail, sendPass)
   text = message.as_string()

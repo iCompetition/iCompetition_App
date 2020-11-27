@@ -25,6 +25,9 @@ dirsToCreate   = [
                  '/var/www/iCompetition/images',
                  '/var/log/iComp'
                  ]
+domain    = ""
+httpsPort = ""
+
 
 def CheckPrereq():
     ##check user
@@ -169,6 +172,9 @@ def buildApacheConf():
 
 
 def buildJSSharedVars():
+    global domain
+    global httpsPort
+        
     domain    = input("What is your public facing url for this server?:  ")
     httpsPort = input("What is your public facing https port for this server?:  ")
     apiPort   = input("What is your public facing api port for this server?:  ")
@@ -204,6 +210,7 @@ def getDbInfo():
     altUser    = getpass.getpass("iCompAlt  User Password:  ")
     
     fh = open('/etc/iCompetition/iComp.conf','w')
+    fh.write('#Database Config\n')
     fh.write('database_location:' + dblocation + '\n')
     fh.write('database_port:' + dbport + '\n')
     fh.write('database_name:' + dbname + '\n')
@@ -218,11 +225,30 @@ def getDbInfo():
     fh = open('/etc/iCompetition/.creds/.iCompAlt','wb')
     fh.write(pwdALT)
     fh.close()        
-  
-def addAdditionalConfig():
+
+def getEmailConf():
+    emailAddr   = input("Enter password reset email address:   ")
+    emailPwd    = input("Enter password reset email password:  ")
+    emailDomain = input("Enter password reset email domain:    ")
+    emailPort   = input("Enter password reset email port:      ")
     fh = open('/etc/iCompetition/iComp.conf','a')
-    fh.write('version:' + installVersion)
-    fh.write('fastLapBonusAmount:10')
+    fh.write("#Send Email Config\n")
+    fh.write('emailLink:' + domain + ':' + httpsPort + "\n")
+    fh.write("sendEmailAddr:"   + emailAddr + "\n")
+    fh.write("sendEmailPass:"   + emailPwd + "\n")
+    fh.write("sendEmailDomain:" + emailDomain + "\n")
+    fh.write("sendEmailPort:"   + emailPort + "\n")
+    fh.close()
+    
+
+def addAdditionalConfig():
+    global domain
+    global httpsPort
+    fh = open('/etc/iCompetition/iComp.conf','a')
+    fh.write('#iCompetition Version\n')
+    fh.write('version:' + installVersion + "\n")
+    fh.write('#Bonus Points For Fast Lap Bonus\n')
+    fh.write('fastLapBonusAmount:10\n')
     fh.close()
 
 
@@ -233,6 +259,8 @@ def main():
     buildJSSharedVars()
     copyFiles()
     getDbInfo()
+    getEmailConf()
+    addAdditionalConfig()
     sys.stdout.write('\n\n')
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')
