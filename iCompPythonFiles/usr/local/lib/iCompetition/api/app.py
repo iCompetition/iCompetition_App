@@ -298,7 +298,7 @@ def pullRegisteredEvents():
   t = parser['token']
   if validateToken(t):    
     apiLog.info("Pulling event list for " + u)
-    getEvents = db_getRegisteredEvents(u,roPwd)
+    getEvents = db_getRegisteredEvents(u,0,roPwd)
     htmlStr2 = ""
     htmlStr = '<table class="table" >'
     htmlStr = htmlStr + '<thead class="bg-primary" ><tr>'
@@ -576,6 +576,51 @@ def pullEventDetailInfo():
       userSelDropDownHtml.append('<option value="' + str(userPar[i][0]) + '">#' + str(userPar[i][0]) + ' - ' + userPar[i][1] + '</option>')
       
   return json.dumps({'schedule' : scheduleHtml, 'rankings': rankingHTML, 'eventName':eventBaseInfo[0], 'eventSeries':eventBaseInfo[1], 'driverSelect' : userSelDropDownHtml})
+
+
+@app.route('/iComp/events/updateEventDisplayTable',methods=['GET'])
+def updateEventDisplayTable():
+  parser    = request.args
+  token     = parser['token']
+  which     = parser['display']
+  u         = parser['user']
+  getEvents = ""
+  if validateToken(token):    
+    if which == "act":
+      apiLog.info("Pulling event list for " + u)
+      getEvents = db_getRegisteredEvents(u,0,roPwd)
+    elif which == "fin":
+      apiLog.info("Pulling event list for " + u)
+      getEvents = db_getRegisteredEvents(u,1,roPwd)
+      
+    htmlStrBase = '''
+             <h2 class="mb-1 p-2 border-bottom border-primary text-light bg-dark">EVENTS</h2>
+             <select class="mb-1 float-left" id='eventTypeSelect' onChange="changeEventDisplayType();">
+             <option value="act">Active Events</option>
+             <option value="fin">Finished Events</option>
+             </select>
+             '''
+    htmlStr = '<table class="table" >'
+    htmlStr = htmlStr + '<thead class="bg-primary" ><tr>'
+    htmlStr = htmlStr + '<th scope="col" >Event Num</th>'
+    htmlStr = htmlStr + '<th scope="col" >Event Name</th>'
+    htmlStr = htmlStr + '<th scope="col" >iRacing Series</th>'
+    htmlStr = htmlStr + '<th scope="col" >Car Used</th>'
+    htmlStr = htmlStr + '<th scope="col" >View Details</th>'
+    htmlStr = htmlStr + '</tr></thead>'
+    htmlStr = htmlStr + '<tbody>'
+    for row in range(len(getEvents)):
+      htmlStr = htmlStr + '<tr>'
+      htmlStr = htmlStr + '<th scope="row">' + str(getEvents[row][0]) + '</th>'
+      htmlStr = htmlStr + '<td>' + getEvents[row][1] + '</th>'
+      htmlStr = htmlStr + '<td>' + getEvents[row][2] + '</td>'
+      htmlStr = htmlStr + '<td>' + getEvents[row][3] + '</td>'
+      htmlStr = htmlStr + '<td><button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="eventDetail(' + str(getEvents[row][0]) + ');">View Details</button></td>'   
+      htmlStr = htmlStr + '</tr>'
+    htmlStr = htmlStr + '</tbody>'
+    htmlStr = htmlStr + '</table>'
+
+    return json.dumps({'html':htmlStrBase + htmlStr})
 
 
 @app.route('/iComp/event/modify/getResultsPreModify', methods=['GET'])

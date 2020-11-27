@@ -338,3 +338,39 @@ function closeAcctConfigModal(){
   document.getElementById("emailChange_new_conf").value = "";
   hideModal("acctConfigModal");
 }
+
+function changeEventDisplayType(){
+  displayBox = document.getElementById("eventTypeSelect");
+  displaySel = displayBox.options[displayBox.selectedIndex].value;
+  selVal     = displaySel
+  urladdr =  ""
+  if  (displaySel == "act"){
+    urladdr = apiAddress + "iComp/events/updateEventDisplayTable?user=" + getCookie("userName") + "&display=act&token=" + getCookie("auth");
+    document.getElementById("logScoreBut").disabled = false;
+    document.getElementById("eventRegBut").disabled = false;    
+  }else{
+    urladdr = apiAddress + "iComp/events/updateEventDisplayTable?user=" + getCookie("userName") + "&display=fin&token=" + getCookie("auth");
+    document.getElementById("logScoreBut").disabled = true;
+    document.getElementById("eventRegBut").disabled = true;
+  }
+  
+  const call = new XMLHttpRequest(),
+    url = urladdr;
+    call.open("GET",url,false);
+    call.send(null);
+    response = JSON.parse(call.responseText);
+    
+    eTableDiv = document.getElementById("eventTableDiv")
+    eTableDiv.innerHTML = response.html;
+    if  (selVal == "act"){
+      displayBox = document.getElementById("eventTypeSelect");
+      displayBox.selectedIndex = 0;
+    }else{
+      displayBox = document.getElementById("eventTypeSelect");
+      displayBox.selectedIndex = 1;
+    }
+
+  
+
+
+}

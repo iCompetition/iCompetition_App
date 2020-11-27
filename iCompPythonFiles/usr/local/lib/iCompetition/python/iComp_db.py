@@ -203,12 +203,13 @@ def db_regForEvent(eventNum,userName,userNum,car,rights):
   return True
 
 
-def db_getRegisteredEvents(userName,rights):
+def db_getRegisteredEvents(userName,which,rights):
   query = """select e.eventNum, e.name, e.series, p.vehicle 
              from event e 
              inner join participants p 
              where e.eventNum = p.eventNum 
-             and p.username = '""" + userName + """'
+             and p.username = '""" + userName   + """'
+             and e.finished = """ + str(which) + """
              order by e.eventNum;
              """
   db = _dbConnect("read",rights)

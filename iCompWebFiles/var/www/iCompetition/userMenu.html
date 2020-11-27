@@ -55,13 +55,17 @@
           </table>
           <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="logOut();">Log Out</button>
           <!-- <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" data-toggle="modal" data-target="#eventRegModal" onClick="checkForAvaEvents();">Event Registration</button> -->
-          <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="checkForAvaEvents();">Event Registration</button>
+          <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" id='eventRegBut' onClick="checkForAvaEvents();">Event Registration</button>
           <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100 disabled" id='logScoreBut' data-toggle="modal" data-target="#scoreLoggingModal">Log a Score</button> 
           <button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" id='accConfigButton' data-toggle="modal" data-target="#acctConfigModal">Account</button> 
       </div>
       <div class="col-lg-10" >
         <div id="eventTableDiv" class="text-center">
-          <h2 class="mb-3 p-2 border-bottom border-primary text-light bg-dark">EVENTS</h2>
+          <h2 class="mb-1 p-2 border-bottom border-primary text-light bg-dark">EVENTS</h2>
+          <select class="mb-1 float-left" id='eventTypeSelect' onChange="changeEventDisplayType();">
+            <option value="act">Active Events</option>
+            <option value="fin">Finished Events</option>
+          </select>          
         </div>
       </div>      
     </div>
