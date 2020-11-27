@@ -63,12 +63,10 @@ def sendPassResetEmail(email, userName, token):
                    <body>
                     <p>You have requested to reset your password for iCompetition for UserName: """ + userName + """.
                        Click the link below to reset. </p>
-                       <p><a href='""" + domain + """ + /resetPass.html?userName=""" + userName + """&validation=""" + token + """' >Reset Password</a></p>
+                       <p><a href='""" + domain + """/resetPass.html?userName=""" + userName + """&validation=""" + token + """' >Reset Password</a></p>
                    </body>
                  </html>
                  """                       
-  #sendEmail = "noReply.iComp@gmail.com"
-  #sendPass = "UNKtMS5fWrm6gvnpGQfI"
   sendEmail = conf['sendEmailAddr']
   sendPass  = conf['sendEmailPass']
   message = MIMEMultipart()
@@ -76,7 +74,6 @@ def sendPassResetEmail(email, userName, token):
   message['To']   = email
   message['Subject'] = "iCompetition Password Change Request"
   message.attach(MIMEText(mail_content, 'html'))
-  #session = smtplib.SMTP('smtp.gmail.com', 587)
   session = smtplib.SMTP(conf['sendEmailDomain'],conf['sendEmailPort'])
   session.starttls()
   session.login(sendEmail, sendPass)
