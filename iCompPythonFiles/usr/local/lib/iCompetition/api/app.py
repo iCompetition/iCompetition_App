@@ -58,6 +58,10 @@ else:
 """
 Safe Util Endpoints
 """
+@app.route('/iComp/reachable', methods=['GET'])
+def apiReachable():
+  return json.dumps({'hello' : True})
+
 @app.route('/iComp/version', methods=['GET'])
 def sendVersionInfo():
   return json.dumps({'version' : confDict['version']})

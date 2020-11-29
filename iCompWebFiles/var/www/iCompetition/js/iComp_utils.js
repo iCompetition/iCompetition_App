@@ -68,3 +68,12 @@ function getVersionInfo(){
     }
     call.send(null);
 }
+
+function iCompServerCheck(){
+  const call = new XMLHttpRequest(),
+    url = apiAddress + "iComp/reachable";
+    call.open("GET",url,true);
+    call.onerror = function(){displayAlertDimissableInfo("iCompetition Servers Are Not Reachable At This Time");};
+    call.send(null);
+     
+}
