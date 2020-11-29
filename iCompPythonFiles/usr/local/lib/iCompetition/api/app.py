@@ -391,8 +391,8 @@ def pullEventDetailInfo():
   scheduleHtml = scheduleHtml + "<th>Inc</th>"
   scheduleHtml = scheduleHtml + "<th>Fast Lap</th>"
   scheduleHtml = scheduleHtml + "</tr>"
-  droppedWk = []
-  wkScore  = []
+  droppedWk    = []
+  wkScore      = []
   
   for i in range(len(scheduleResults)):
     if str(scheduleResults[i][3]) != '':
@@ -817,12 +817,6 @@ def adm_clearTokens():
   return "apiContected"
   
 
-##Trigger Host - END
-if __name__ == "__main__":
-  apiLog.info("Starting iCompAPI In DEV MODE")
-  app.run(host=hostIP, port= portNum)
-  
-  
 @app.route('/iComp/admin/getUserInfo', methods=['POST'])
 def adm_getUserInfo():
   auth     = request.form['auth']
@@ -839,4 +833,102 @@ def adm_getUserInfo():
     return json.dumps({'result':True,'html':html})
   else:
     return json.dumps({'result':False})
+
+
+@app.route('/iComp/admin/getActiveEvents', methods=['POST'])
+def adm_getActiveEvents():
+  auth = request.form['auth']
+  if validateAdmToken(auth):
+    eventList = db_listEvents_active(roPwd)
+    html = """
+            <tr>
+              <th>Event</th>
+              <th>EventNum</th>
+              <th>Finish</th>
+            </tr>
+           """
+    for row in range(len(eventList)):
+      html = html + """
+                      <tr>
+                        <td>""" + str(eventList[row][0])      + """</td>
+                        <td>""" + str(eventList[row][1])      + """</td>
+                        <td>""" + """<button type=\"submit\" class=\"mt-2 mb-3 btn btn-outline-primary btn-lg w-100\" onClick=\"adm_finishEvent('""" + str(eventList[row][1]) + """');\" >Finish</button> """ + """</td>
+                      </tr>
+                    """
     
+    return json.dumps({'result':True,'html':html})
+  else:
+    return json.dumps({'result':False})    
+
+
+@app.route('/iComp/admin/finishEvent', methods=['POST'])
+def adm_finishEvent():
+  auth           = request.form['auth']
+  eventNum       = request.form['event']
+  rankingResults = db_pullEventUserRank(eventNum,roPwd)
+  rankingInfo    = []
+  reviewed       = []
+  eventBaseInfo = db_getEventBaseInfo(eventNum,roPwd)
+  ##Set FLB enabled/disabled
+  fastLapEnabled = False
+  if str(eventBaseInfo[2]) == "1":
+    fastLapEnabled = True
+  
+  for row in range(len(rankingResults)):
+    tmpPoints  = []
+    bonus      = 0
+    userNum    = rankingResults[row][0]
+    userFirst  = rankingResults[row][1]
+    userLast   = rankingResults[row][2]
+    userCar    = rankingResults[row][3]
+    fastLap    = rankingResults[row][6]
+    if userNum not in reviewed:
+      reviewed.append(userNum)
+      for row2 in range(len(rankingResults)):
+        if rankingResults[row2][0] == userNum:
+          tmpPoints.append(rankingResults[row2][4])
+      tmpPoints.sort()
+      if len(tmpPoints) == 13:
+        del tmpPoints[:5]
+      elif len(tmpPoints) == 12:
+        del tmpPoints[:4]
+      elif len(tmpPoints) == 11:
+        del tmpPoints[:3]
+      elif len(tmpPoints) == 10:
+        del tmpPoints[:2]
+      elif len(tmpPoints) == 9:
+        del tmpPoints[:1]
+      else:
+        pass
+
+      if fastLapEnabled:
+        bonus = 0
+        userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
+        for i in range(len(eventFastLabTimes)):
+          for j in range(len(userFL)):
+            try:
+              if eventFastLabTimes[i][1] == userFL[i][1]:
+                if i < 9:
+                  bonus = bonus + fl_bonus
+                  break
+                else:
+                  pass
+            except IndexError:
+              pass
+
+  pointSum = sum(tmpPoints) + bonus
+  rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
+  rankingInfo.sort(reverse=True)
+  driverInfo = rankingInfo[0][1].split('|')
+  driver = driverInfo[0] + ' ' + driverInfo[1]
+
+  if validateAdmToken(auth):  
+    finishEvent = db_finishEvent(eventNum, userNum, driver, altPwd)
+    return json.dumps({'result':finishEvent})
+  else:
+    return json.dumps({'result':False})
+
+##Trigger Host - END
+if __name__ == "__main__":
+  apiLog.info("Starting iCompAPI In DEV MODE")
+  app.run(host=hostIP, port= portNum)

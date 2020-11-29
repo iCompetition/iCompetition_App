@@ -73,6 +73,24 @@ function adm_listEvents(){
   }
 }
 
+function adm_listEvents_active(){
+  header = document.getElementById("simpleListHeader");
+  tbl    = document.getElementById("simpleListTable");
+  const xhttp = new XMLHttpRequest();
+  url = apiAddress + "iComp/admin/getActiveEvents";
+  xhttp.open("POST",url,false);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send("auth=" + getCookie("atok"));
+  response = JSON.parse(xhttp.responseText);
+  if (response.result != true){
+    displayAlertDimissableInfo("Token Invalid");
+  }else{
+    header.innerHTML = "Total Events: " + response.cnt;
+    tbl.innerHTML = response.html;
+    showModal("simpleListModal");
+  }
+}
+
 function adm_createEvent(){
   en  = document.getElementById("ce_ename").value;
   es  = document.getElementById("ce_sname").value;  
@@ -189,7 +207,24 @@ function actOnChangeChg(reqNum,appDeny){
 }
 
 
+function adm_finishEvent(evNum){
+  const xhttp = new XMLHttpRequest();
+  url = apiAddress + "iComp/admin/finishEvent";
+  xhttp.open("POST",url,false);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send("auth=" + getCookie("atok") + "&event=" + evNum);
+  response = JSON.parse(xhttp.responseText);
+  if (response.result == true){
+    displayAlertDimissableInfo("Action Completed");
+  }else{
+    displayAlertDimissableInfo("Action Failed");
+  }
 
+  hideModal("simpleListModal")
+
+
+
+}
 
 
 

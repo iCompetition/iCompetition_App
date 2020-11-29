@@ -106,7 +106,7 @@ def db_getUsrInfo(userName, rights):
   isAdmin = "N"
   db = _dbConnect("read",rights)
   cr = db.cursor()
-  cr.execute("select firstName, lastName, userNum, admin from users where userName = '" + userName + "';")
+  cr.execute("select firstName, lastName, userNum, admin, wins from users where userName = '" + userName + "';")
   results = cr.fetchall()
   _dbClose(db, cr)
   if results[0][3] == 1: 
@@ -115,6 +115,7 @@ def db_getUsrInfo(userName, rights):
           'firstName' : results[0][0],
           'lastName'  : results[0][1],
           'userNum'   : results[0][2], 
+          'userWins'  : results[0][4], 
           'admin'     : isAdmin
           }
 
@@ -342,6 +343,15 @@ def db_listEvents(rights):
   return results  
 
 
+def db_listEvents_active(rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor() 
+  cr.execute("select name, eventNum from event where finished = 0 order by eventNum")
+  results = cr.fetchall()
+  _dbClose(db,cr)
+  return results  
+
+
 def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus):
   eNum = 0
   carList = cars.split(",")
@@ -550,4 +560,17 @@ def db_rejectChgReq(reqNum, rights):
   cr.execute(query2)         
   _dbClose(db,cr)
   return True
+
+
+def db_finishEvent(eventNum, userNum, driver, rights):
+  db = _dbConnect("write",rights)
+  cr = db.cursor()
+
+  cr.execute("update event set finished = 1 where eventNum = " + str(eventNum) + ";")
+  cr.execute("update event set winner = '" + driver + "' where eventNum = " + str(eventNum) + ";")
+  cr.execute("update users set wins = wins+1 where userNum = " + str(userNum) + ";")
+  _dbClose(db,cr)
+  return True
+
+
 

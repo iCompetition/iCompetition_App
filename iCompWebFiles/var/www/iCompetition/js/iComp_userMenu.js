@@ -24,6 +24,7 @@ function loadUserPage(){
     document.getElementById("um_fnametd").innerHTML = responseUI.firstName;
     document.getElementById("um_lnametd").innerHTML = responseUI.lastName;
     document.getElementById("um_numtd").innerHTML   = responseUI.userNum;
+    document.getElementById("um_wins").innerHTML    = responseUI.userWins;
     setCookie("userNum",responseUI.userNum,7);
     if (responseUI.admin == "Y"){
       var adminButton = document.createElement("div");
