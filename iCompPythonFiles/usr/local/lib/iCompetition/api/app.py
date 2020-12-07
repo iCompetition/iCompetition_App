@@ -1,3 +1,6 @@
+###################################################
+### START STANDARD IMPORTS
+###################################################
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask import request
@@ -7,14 +10,26 @@ import re
 import json
 import logging
 import logging.handlers
+###################################################
+### END STANDARD IMPORTS
+###################################################
+###################################################
+###################################################
+### START ICOMPETITION IMPORTS
+###################################################
 sys.path.append("/usr/local/lib/iCompetition/python")
 sys.path.append("/usr/local/lib/iCompetition/python/crypt")
 from credManagement import getCred
 from iComp_util import *
 from iComp_db import *
 from iComp_user import *
-
-##Logging config
+###################################################
+### END ICOMPETITION IMPORTS
+###################################################
+###################################################
+###################################################
+### START LOGGING CONFIG
+###################################################
 if not os.path.exists('/var/log/iComp/'):
   os.mkdir('/var/log/iComp/')
 apiLog = logging.getLogger('APILOG')
@@ -23,28 +38,41 @@ logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/api.log', maxB
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 logHandler.setFormatter(formatter)
 apiLog.addHandler(logHandler)
-
-##pathing check
+###################################################
+### END LOGGING CONFIG
+###################################################
+###################################################
+###################################################
+### START CONFIG AND PATHING CHECKS
+###################################################
+#1) PATHING CHECKS
 ensureTokenDirsExist()
 
-##config setup
+#2) CONFIG INFO PULL
 confDict = getConf()
 fl_bonus = int(confDict['fastLabBonusAmount'])
 
-##Host Run Info Variables
+#3) API HOST RUN  VARIABLES
 app = Flask(__name__)
 CORS(app)
 hostIP = '0.0.0.0'
 portNum = 5001
-
+###################################################
+### END CONFIG AND PATHING CHECKS
+###################################################
+###################################################
+###################################################
+### START ICOMPEITION API INIT
+###################################################
+#1) INITIAL OUTPUT
 apiLog.info("Init iCompAPI - iCompetition " + confDict['version'])
 apiLog.info("HostIP: " + hostIP)
 apiLog.info("HostPort:" + str(portNum))
+#2) GIT DATABASE CREDENTIALS
 apiLog.info("Gathering DB account information")
-roPwd = idecrypt(getCred("iCompRead"))
+roPwd  = idecrypt(getCred("iCompRead"))
 altPwd = idecrypt(getCred("iCompAlt"))
-
-##Schema check
+#3) CHECK DATABASE SCHEMA VERSION
 dbSchema = db_schemaVersion(roPwd)
 majorVer = confDict['version'].split('.')[0] + '.' +confDict['version'].split('.')[1]
 apiLog.info("DBSchema Version: " + str(dbSchema))
@@ -55,39 +83,67 @@ else:
   pass
   apiLog.info("Complete")
   apiLog.info("Starting iCompAPI")
-
-"""
-Safe Util Endpoints
-"""
+###################################################
+### END ICOMPEITION API INIT
+###################################################
+###################################################
+###################################################
+### START UTILITY END POINTS
+###################################################
 @app.route('/iComp/reachable', methods=['GET'])
 def apiReachable():
-  return json.dumps({'hello' : True})
+  return json.dumps(
+                     {
+                       'hello' : True
+                     }
+                   )
 
 @app.route('/iComp/version', methods=['GET'])
 def sendVersionInfo():
-  return json.dumps({'version' : confDict['version']})
-
-
-
-"""
-AUTH ENDPOINTS 
-"""
+  return json.dumps(
+                     {
+                       'version' : confDict['version']
+                     }
+                   )
+###################################################
+### END UTILITY END POINTS
+###################################################
+###################################################
+###################################################
+### START AUTHORIZATION END POINTS
+###################################################
 @app.route('/iComp/auth/checkToken', methods=['POST'])
 def authCheckToken():
   token = request.form['token']
   if validateToken(token):
-    return json.dumps({'result':True})
+    return json.dumps(
+                       {
+                         'result':True
+                       }
+                     )
   else:
-    return json.dumps({'result':False})
+    return json.dumps(
+                       {
+                         'result':False
+                       }
+                     )
 
 
 @app.route('/iComp/auth/checkResetToken', methods=['POST'])
 def authCheckToken_pwdReset():
   token = request.form['token']
   if validatePwdToken(token):
-    return json.dumps({'result':True})
+    return json.dumps(
+                       {
+                         'result':True
+                       }
+                     )
   else:
-    return json.dumps({'result':False})
+    return json.dumps(
+                       {
+                         'result':False
+                       }
+                     )
 
 
 @app.route('/iComp/auth/adminStatus', methods=['POST'])
@@ -97,14 +153,25 @@ def authAdminStatus():
   isAdmin = db_authAdminStatus(un, roPwd)
   if validateToken(token) and isAdmin == 1:
     adminToken = generateAdminToken()
-    return json.dumps({'result':True, 'adminToken':adminToken})
+    return json.dumps(
+                       {
+                         'result':True,
+                         'adminToken':adminToken
+                       }
+                     )
   else:
-    return json.dumps({'result':False})
-  
- 
-""" 
-USER ACCOUNT ENDPOINTS
-"""
+    return json.dumps(
+                       {
+                         'result':False
+                       }
+                     )
+###################################################
+### END AUTHORIZATION END POINTS
+###################################################  
+################################################### 
+###################################################
+### START USER ACCOUNT END POINTS
+################################################### 
 @app.route('/iComp/users/createUser', methods=['POST'])
 def createAccount():
   apiLog.info("ACCT CREATE EP")
@@ -274,10 +341,13 @@ def changeUserEmail():
                          'message' : 'auth token was not valid'
                        }
                      )
-
-"""
-EVENT RELATED ENDPOINTS
-"""
+###################################################
+### END USER ACCOUNT END POINTS
+################################################### 
+###################################################
+###################################################
+### START EVENT END POINTS
+################################################### 
 @app.route('/iComp/events/eventCountCheck', methods=['GET'])
 def userHasAnEvent():
   parser = request.args
@@ -771,11 +841,13 @@ def appDenyReq():
         return json.dumps({'success' : False})  
   else:
     return json.dumps({'success' : False})
-
-"""
-Admin Endpoints
-"""
-
+###################################################
+### END EVENT END POINTS
+################################################### 
+###################################################
+###################################################
+### START ADMINISTRATION END POINTS
+################################################### 
 @app.route('/iComp/admin/listUsers', methods=['POST'])
 def adm_listUsers():
   auth = request.form['auth']
@@ -987,8 +1059,16 @@ def adm_finishEvent():
     return json.dumps({'result':finishEvent})
   else:
     return json.dumps({'result':False})
-
-##Trigger Host - END
+###################################################
+### END ADMINISTRATION END POINTS
+################################################### 
+###################################################
+###################################################
+### START RUN MAIN
+################################################### 
 if __name__ == "__main__":
   apiLog.info("Starting iCompAPI In DEV MODE")
   app.run(host=hostIP, port= portNum)
+###################################################
+### END RUN MAIN
+################################################### 

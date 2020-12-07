@@ -7,8 +7,6 @@ import sys
 import logging
 
 ##iCompImports
-sys.path.append("/usr/local/lib/iCompetition/python")
-sys.path.append("/usr/local/lib/iCompetition/python/crypt")
 from iComp_db import *
 from iComp_util import *
 
