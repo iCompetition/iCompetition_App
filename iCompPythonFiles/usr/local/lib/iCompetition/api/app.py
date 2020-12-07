@@ -186,10 +186,17 @@ def resetUserPassword():
   apiLog.info("Password reset init for " + u)
   pwdChg = set_iCompUserPassword(u,p,t,altPwd)
   if pwdChg:
-    return json.dumps({'result':True})
+    return json.dumps(
+                       {
+                          'result' : True
+                       }
+                     )
   else:
-    return json.dumps({'result':False})
-
+    return json.dumps(
+                       {
+                          'result' : False
+                       }
+                     )
 
 @app.route('/iComp/users/changePassword', methods=['POST'])
 def changeUserPassword():
@@ -202,13 +209,32 @@ def changeUserPassword():
   if validateToken(token):
     if validate_iCompUser(userName,dbHasher(curPass),roPwd):
       if set_iCompUserPassword(userName,newPass,token,altPwd):
-        return json.dumps({'success': True})
+        return json.dumps(
+                           { 
+                             'success' : True
+                           }
+                         )
       else:
-        return json.dumps({'success': False, 'message' : 'Failed to submit password change'})
+        return json.dumps(
+                          {
+                            'success' : False, 
+                            'message' : 'Failed to submit password change'
+                          }
+                         )
     else:
-      return json.dumps({'success': False, 'message' : 'Current password was not valid'})
+      return json.dumps(
+                         {
+                           'success': False, 
+                           'message' : 'Current password was not valid'
+                         }
+                       )
   else:
-    return json.dumps({'success': False, 'message' : 'auth token was not valid'})
+    return json.dumps(
+                       {
+                         'success': False, 
+                         'message' : 'auth token was not valid'
+                       }
+                     )
 
 
 @app.route('/iComp/users/changeEmail', methods=['POST'])
@@ -222,13 +248,32 @@ def changeUserEmail():
   if validateToken(token):
     if validate_iCompUser(userName,dbHasher(curPass),roPwd):
       if set_iCompUserEmail(username,newEmail,token,altPwd):
-        return json.dumps({'success': True})
+        return json.dumps(
+                          {
+                            'success': True
+                          }
+                         )
       else:
-        return json.dumps({'success': False, 'message' : 'Failed to submit email change'})
+        return json.dumps(
+                           {
+                             'success': False,
+                             'message' : 'Failed to submit email change'
+                           }
+                         )
     else:
-      return json.dumps({'success': False, 'message' : 'Password was not valid'})
+      return json.dumps(
+                         {
+                           'success': False,
+                           'message' : 'Password was not valid'
+                         }
+                       )
   else:
-    return json.dumps({'success': False, 'message' : 'auth token was not valid'})
+    return json.dumps(
+                       {
+                         'success': False,
+                         'message' : 'auth token was not valid'
+                       }
+                     )
 
 """
 EVENT RELATED ENDPOINTS
