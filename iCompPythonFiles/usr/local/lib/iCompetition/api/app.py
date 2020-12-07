@@ -12,6 +12,7 @@ sys.path.append("/usr/local/lib/iCompetition/python/crypt")
 from credManagement import getCred
 from iComp_util import *
 from iComp_db import *
+from iComp_user import *
 
 ##Logging config
 if not os.path.exists('/var/log/iComp/'):
@@ -104,61 +105,69 @@ def authAdminStatus():
 """ 
 USER ACCOUNT ENDPOINTS
 """
-
 @app.route('/iComp/users/createUser', methods=['POST'])
 def createAccount():
-  uName = request.form['userName']
-  fName = request.form['firstName']
-  lName = request.form['lastName']
-  pwd   = request.form['password']
-  email = request.form['email']
-  
-  if not iCompUtils_validateEmail(email):
-    return json.dumps({'result':False,'message':'Invalid Email Format'})
-  
-  apiLog.info("Create accout attempt:")
-  apiLog.info("\tUN:" + uName)
-  apiLog.info("\tFN:" + fName)
-  apiLog.info("\tLN:" + lName)
-  createUser = db_createAccount(uName,fName,lName,pwd,email,altPwd)
-  if not createUser['result']:
-    return json.dumps({'result':False,'message':createUser['message']})
-  elif createUser['result']:
-    return json.dumps({'result':True,'message':createUser['message']})
-
+  apiLog.info("ACCT CREATE EP")
+  uName      = request.form['userName']
+  fName      = request.form['firstName']
+  lName      = request.form['lastName']
+  pwd        = request.form['password']
+  email      = request.form['email']
+  createAcct = create_iCompAccount(uName,fName,lName,pwd,email,altPwd)
+  return json.dumps(
+                     {
+                       'result'  : createAcct['results'],
+                       'message' : createAcct['message']
+                     }
+                    )
 
 @app.route('/iComp/users/login', methods=['POST'])
 def loginUser():
-  u = request.form['userName']
-  p = dbHasher(request.form['password'])
-  login = db_loginUser(u,p,roPwd)
+  apiLog.info("USER LOGIN EP")
+  u     = request.form['userName']
+  p     = dbHasher(request.form['password'])
+  login = validate_iCompUser(u,p,roPwd)
   try:
     if login:
-      apiLog.info("User \'" + u + "\' logged into iComp")
-      token = generateToken()
-      return json.dumps({'result':True, 'token':token})
+      return json.dumps(
+                        {
+                          'result' : True, 
+                          'token'  : login['token']
+                        }
+                       )
     else:
-      apiLog.info("User \'" + u + "\' tried logged into iComp")
-      return json.dumps({'result':False, 'message':'Username or Password Incorrect'})
+      return json.dumps(
+                        {
+                          'result'  : True, 
+                          'message' : login['message']
+                        }
+                       )
   except TypeError:
-    return json.dumps({'result':False, 'message':'Username or Password Incorrect'})  
+    return json.dumps(
+                      {
+                        'result'  : True, 
+                        'message' : login['message']
+                      }
+                     )
 
 
 @app.route('/iComp/users/getUserInfo', methods=['GET'])
 def getUserInfo():
+  apiLog.info("GET USER INFO EP")
   parser = request.args
-  u = parser['userName']
-  t = parser['token']
-  if validateToken(t):
-    userInfo = db_getUsrInfo(u,roPwd)
-    apiLog.info("userMenu refresh occured for " + u)
-    return json.dumps(userInfo)
-  else:
+  u        = parser['userName']
+  t        = parser['token']
+  userInfo = get_iCompUserInfo(u,t,roPwd)
+
+  if not userInfo:
     return False
+  else:
+    return json.dumps(userInfo)
 
 
 @app.route('/iComp/users/requestPassReset', methods=['GET'])
 def initPasswordEmail():
+  apiLog.info("REQUEST PASS RESET EP")
   parser = request.args
   u = parser['userName']
   apiLog.info("password email triggered for user: " + u)
@@ -170,28 +179,29 @@ def initPasswordEmail():
 
 @app.route('/iComp/users/resetPassword', methods=['POST'])
 def resetUserPassword():
+  apiLog.info("PASS RESET EP")
   u = request.form['userName']  
   t = request.form['token']
   p = request.form['pw']
   apiLog.info("Password reset init for " + u)
-  if validatePwdToken(t):
-    if db_changePass(p,u,altPwd):
-      clearToken(t)
-      return json.dumps({'result':True})
-    else:
-      return json.dumps({'result':False})
+  pwdChg = set_iCompUserPassword(u,p,t,altPwd)
+  if pwdChg:
+    return json.dumps({'result':True})
+  else:
+    return json.dumps({'result':False})
 
 
 @app.route('/iComp/users/changePassword', methods=['POST'])
 def changeUserPassword():
+  apiLog.info("CHANGE PASSWORD EP")
   userName = request.form['userName']  
   curPass  = request.form['curPass']
   newPass  = request.form['newPass']
   token    = request.form['auth']
   
   if validateToken(token):
-    if db_loginUser(userName,dbHasher(curPass),roPwd):
-      if db_changePass(newPass,userName,altPwd):
+    if validate_iCompUser(userName,dbHasher(curPass),roPwd):
+      if set_iCompUserPassword(userName,newPass,token,altPwd):
         return json.dumps({'success': True})
       else:
         return json.dumps({'success': False, 'message' : 'Failed to submit password change'})
@@ -203,14 +213,15 @@ def changeUserPassword():
 
 @app.route('/iComp/users/changeEmail', methods=['POST'])
 def changeUserEmail():
+  apiLog.info("CHANGE EMAIL EP")
   userName = request.form['userName']  
   curPass  = request.form['pass']
   newEmail = request.form['newEmail']
   token    = request.form['auth']
   
   if validateToken(token):
-    if db_loginUser(userName,dbHasher(curPass),roPwd):
-      if db_changeEmail(newEmail,userName,altPwd):
+    if validate_iCompUser(userName,dbHasher(curPass),roPwd):
+      if set_iCompUserEmail(username,newEmail,token,altPwd):
         return json.dumps({'success': True})
       else:
         return json.dumps({'success': False, 'message' : 'Failed to submit email change'})
