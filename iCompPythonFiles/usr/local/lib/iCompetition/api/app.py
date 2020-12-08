@@ -23,6 +23,7 @@ from credManagement import getCred
 from iComp_util import *
 from iComp_db import *
 from iComp_user import *
+from iComp_event import *
 ###################################################
 ### END ICOMPETITION IMPORTS
 ###################################################
@@ -314,7 +315,7 @@ def changeUserEmail():
   
   if validateToken(token):
     if validate_iCompUser(userName,dbHasher(curPass),roPwd):
-      if set_iCompUserEmail(username,newEmail,token,altPwd):
+      if set_iCompUserEmail(userName,newEmail,token,altPwd):
         return json.dumps(
                           {
                             'success': True
@@ -350,146 +351,116 @@ def changeUserEmail():
 ################################################### 
 @app.route('/iComp/events/eventCountCheck', methods=['GET'])
 def userHasAnEvent():
+  apiLog.info("EVENT COUNT CHECK EP")
   parser = request.args
-  u = parser['userName']
-  t = parser['token']
-  if validateToken(t):
-    evCheck = db_checkIfUserHasEvent(u,roPwd)
-    apiLog.info("event count check occured for " + u)
-    if len(evCheck) < 1:
-      return json.dumps({'result':False})
-    else:
-      return json.dumps({'result':True})
-  else:
-    return json.dumps({'result':False})
-
+  u          = parser['userName']
+  t          = parser['token']
+  eventCount = get_eventCountForUser(u,t,roPwd)
+  apiLog.info("event count check occured for " + u)
+  if not eventCount or eventCount < 1:
+    return json.dumps(
+                       {
+                         'result' : False
+                       }
+                     )
+  elif eventCount >= 1:
+    return json.dumps(
+                       {
+                         'result' : True,
+                         'count'  : eventCount
+                       }
+                     )
 
 @app.route('/iComp/events/getLiveEvents', methods=['GET'])
 def pullLiveEvents():
+  apiLog.info("GET LIVE EVENTS EP")
   parser = request.args
   u = parser['userName']
   t = parser['token']
-  if validateToken(t):  
-    apiLog.info("pulling live events to userMenu")
-    htmlStr = ""
-    eventList = db_getLiveEvents(u,roPwd)  
-    if len(eventList) > 0:
-      for row in range(len(eventList)):
-        name = eventList[row][0]
-        num = eventList[row][1]
-        htmlStr = htmlStr + "<option value=" + str(num) + ">" + name + "</option>"
-        
-      return json.dumps({'result' : True, 'message' : 'live events found', 'html' : htmlStr})
-    else:
-      return json.dumps({'result' : False, 'message' : 'no live events found', 'eventList' : ""})
-  else:
-    return json.dumps({'result' : False, 'message' : 'invalid auth', 'eventList' : ""})
-
+  eventList = get_liveEventHtmlForUser(u,t,roPwd)
+  return json.dumps(
+                     {
+                       'result'  : eventList['result'],
+                       'message' : eventList['message'],
+                       'html' : eventList['html']
+                     }  
+                  )
   
 @app.route('/iComp/events/getEventCars', methods=['GET'])
 def getEventCars():
-  parser = request.args
-  num = parser['eventNum']
-  apiLog.info("getting cars for event " + str(num))
-  htmlStr = ""
-  carList = db_getEventCars(num,roPwd)
-  for row in range(len(carList)):
-    htmlStr = htmlStr + "<option value='" + carList[row][0] + "'>" + carList[row][0] + "</option>"
-  return json.dumps({'html' : htmlStr})
-
+  apiLog.info("GET EVENT CARS EP")
+  parser        = request.args
+  num           = parser['eventNum']
+  eventCarsHtml = get_carListForEvent(num,roPwd)
+  return json.dumps(
+                     {
+                       'html' : eventCarsHtml
+                     }
+                   )
 
 @app.route('/iComp/events/registerForEvent', methods=['GET'])
 def registerForEvent():
-  success  = False
+  apiLog.info("EVENT REGISTER EP")
   parser   = request.args
   eventNum = parser['eventNum']
   userName = parser['userName']
   userNum  = parser['userNum']
   car      = parser['car']
   t        = parser['token']
-  if validateToken(t):  
-    apiLog.info(userName + " is attempting to register for event number " + str(eventNum))
-    try:
-      db_regForEvent(eventNum,userName,userNum,car,altPwd)
-      success = True
-      apiLog.info("success")
-    except Exception as e:
-      apiLog.warning("Failed - Error")
-      apiLog.error(str(e))
-    return json.dumps({'result' : success})
-  else:
-    return json.dumps({'result' : False})
-    
+  register = set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,token,altPwd)
+  return json.dumps(
+                     {
+                       'result'  : register['result'],
+                       'message' : register['message']
+                     }
+                   )
 
 @app.route('/iComp/events/pullRegisteredEvents', methods=['GET'])
 def pullRegisteredEvents():
+  apiLog.info("PULL EVENT REGISTER EP")
   parser = request.args
   u  = parser['userName']
   t = parser['token']
-  if validateToken(t):    
-    apiLog.info("Pulling event list for " + u)
-    getEvents = db_getRegisteredEvents(u,0,roPwd)
-    htmlStr2 = ""
-    htmlStr = '<table class="table" >'
-    htmlStr = htmlStr + '<thead class="bg-primary" ><tr>'
-    htmlStr = htmlStr + '<th scope="col" >Event Num</th>'
-    htmlStr = htmlStr + '<th scope="col" >Event Name</th>'
-    htmlStr = htmlStr + '<th scope="col" >iRacing Series</th>'
-    htmlStr = htmlStr + '<th scope="col" >Car Used</th>'
-    htmlStr = htmlStr + '<th scope="col" >View Details</th>'
-    htmlStr = htmlStr + '</tr></thead>'
-    htmlStr = htmlStr + '<tbody>'
-    for row in range(len(getEvents)):
-      htmlStr = htmlStr + '<tr>'
-      htmlStr = htmlStr + '<th scope="row">' + str(getEvents[row][0]) + '</th>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][1] + '</th>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][2] + '</td>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][3] + '</td>'
-      htmlStr = htmlStr + '<td><button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="eventDetail(' + str(getEvents[row][0]) + ');">View Details</button></td>'   
-      htmlStr = htmlStr + '</tr>'
-      htmlStr2 = htmlStr2 + "<option value='" + str(getEvents[row][0]) + "'>" + getEvents[row][1] + "</option>"
-    htmlStr = htmlStr + '</tbody>'
-    htmlStr = htmlStr + '</table>'
-  
-    return json.dumps({'html' : htmlStr, 'html2' : htmlStr2})
-  else:
-    return json.dumps({'html' : "invalid auth", 'html2' : "invalid auth"})
-  
+  events = get_registeredEventsForUser(u,0,t,roPwd)
+  return json.dumps(
+                     {
+                       'html' : events['html1'], 
+                       'html2' : events['html2']
+                     }
+                   )
 
 @app.route('/iComp/events/schedule/getUserUnscoredWks', methods=['GET'])
 def getEventScheduleWeeks():
-  parser = request.args
-  en  = parser['eventNum']
-  u   = parser['userName']
-  un = db_getUsrNum(u,roPwd)
-  validWeeks = db_getEventScheduleWeeks(en,un,roPwd)
-  htmlStr = ""
-  for row in range(len(validWeeks)):
-    htmlStr = htmlStr + "<option value='" + str(validWeeks[row][0]) + "'>Week " + str(validWeeks[row][0]) + "</option>"
-  
-  return json.dumps({'html' : htmlStr})
+  apiLog.info("GET UNSCORED WEEKS EP")
+  parser            = request.args
+  en                = parser['eventNum']
+  u                 = parser['userName']
+  unscoredWeeksHtml = get_eventUnscoredWeeksForUser(en,u,roPwd)
+  return json.dumps(
+                     {
+                       'html' : unscoredWeeksHtml
+                     }
+                   )
 
 @app.route('/iComp/events/logScore', methods=['GET'])
 def logScoreForWeek():
-  parser = request.args
-  un  = parser['userNum']
-  en  = parser['eventNum']
-  wn  = parser['wkNum']
-  pos = parser['pos']
-  pnt = parser['pnt']
-  inc = parser['inc']
-  lap = parser['lap']
-  t = parser['token']
-  if validateToken(t):      
-    try:
-      if len(lap.split('.')) == 2:
-        lap = "0." + lap
-      db_logScore(un,en,wn,pos,pnt,inc,lap,altPwd)
-      return json.dumps({'result':True})
-    except Exception as e:
-      return json.dumps({'result':False,'message':str(e)})
-  else:
-    json.dumps({'result':False,'message': 'invalid auth'})
+  apiLog.info("LOG SCORE EP")
+  parser   = request.args
+  un       = parser['userNum']
+  en       = parser['eventNum']
+  wn       = parser['wkNum']
+  pos      = parser['pos']
+  pnt      = parser['pnt']
+  inc      = parser['inc']
+  lap      = parser['lap']
+  t        = parser['token']
+  logScore = set_scoreForUserInEventWeek(un,en,wn,pos,pnt,inc,lap,t,altPwd)
+  return json.dumps(
+                     {
+                       'result' : logScore['result'],
+                       'message' : logScore['message']
+                     }
+                   )  
     
 
 @app.route('/iComp/events/pullDetails', methods=['GET'])
