@@ -174,6 +174,7 @@ def db_getLiveEvents(userName,rights):
         select name, eventNum 
         from event
         where live = 1
+        and finished = 0
         and eventNum not in (select eventNum 
                              from participants
                              where userName = '""" + userName + """')
