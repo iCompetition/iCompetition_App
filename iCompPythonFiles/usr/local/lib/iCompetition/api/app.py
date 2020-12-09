@@ -24,6 +24,7 @@ from iComp_util import *
 from iComp_db import *
 from iComp_user import *
 from iComp_event import *
+from iComp_eventModify import *
 ###################################################
 ### END ICOMPETITION IMPORTS
 ###################################################
@@ -462,356 +463,85 @@ def logScoreForWeek():
                      }
                    )  
     
-
 @app.route('/iComp/events/pullDetails', methods=['GET'])
 def pullEventDetailInfo():
-  parser = request.args
-  un  = parser['userNum']
-  en  = parser['eventNum']
-  curUn = parser['currentUserNum']
-  
-  ##Get base event info
-  eventBaseInfo = db_getEventBaseInfo(en,roPwd)
-  
-  ##Set FLB enabled/disabled
-  fastLapEnabled = False
-  if str(eventBaseInfo[2]) == "1":
-    fastLapEnabled = True
-    
-  ##Get and present single user schedule info
-  scheduleResults = db_pullScheduleResults(en,un,roPwd)
-
-  ##Pull fast time results here and return list as username,week,fastlap ordered by week
-  eventFastLabTimes = db_pullEventFastLaps(en,roPwd)
-
-  scheduleHtml = "<tr>"
-  scheduleHtml = scheduleHtml + "<th>Week</th>"
-  scheduleHtml = scheduleHtml + "<th>Track</th>"
-  scheduleHtml = scheduleHtml + "<th>Position</th>"
-  scheduleHtml = scheduleHtml + "<th>Points</th>"
-  scheduleHtml = scheduleHtml + "<th>Inc</th>"
-  scheduleHtml = scheduleHtml + "<th>Fast Lap</th>"
-  scheduleHtml = scheduleHtml + "</tr>"
-  droppedWk    = []
-  wkScore      = []
-  
-  for i in range(len(scheduleResults)):
-    if str(scheduleResults[i][3]) != '':
-      wkScore.append(int(scheduleResults[i][3]))
-    
-  wkScore.sort(reverse=True)
-  if len(wkScore) > 8:
-    i = 8
-    l = len(wkScore)
-    while i < l:
-      droppedWk.append(str(wkScore[i]))
-      i = i + 1
-    
-  for row in range(len(scheduleResults)):
-    week     = str(scheduleResults[row][0])
-    track    = str(scheduleResults[row][1])
-    position = str(scheduleResults[row][2])
-    points   = str(scheduleResults[row][3])
-    inc      = str(scheduleResults[row][4])
-    chgReq   = str(scheduleResults[row][5])
-    fastLap  = str(scheduleResults[row][6])
-    fastLap_reformed = fastLap
-    ##check for null fastlap
-    if fastLap == "" or fastLap == 0 or fastLap is None:
-      fastLap = "X.XX.XXX"
-    else:
-      pass
-
-    ##check for sub 1.00.000 fastlap
-    if fastLap.split('.')[0] == "0":
-      fastLap_reformed = fastLap.split('.')[1] + "." + fastLap.split('.')[2]
-    else:
-      pass
-
-    if points in droppedWk:
-      ##HTML for dropped week
-      scheduleHtml = scheduleHtml + "<tr class='highlight_grey' >"  
-      scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Low score week dropped from total"><i class="fas fa-info-circle"></i></a>  ' + week + '</td>'
-      scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-      if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
-        scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-      elif position != '' and un.strip() == curUn.strip():
-        scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
-      else:
-        scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-      scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-      scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-      scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-      scheduleHtml = scheduleHtml + "</tr>"    
-      del droppedWk[droppedWk.index(points)]
-    else:
-      ##HTML for counted week
-      ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      if fastLapEnabled and row < len(eventFastLabTimes):
-        if fastLap == eventFastLabTimes[row][1]:
-          scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
-          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap Bonus Applied For This Week"><i class="fas fa-stopwatch"></i></a>  ' + week + '</td>'
-          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-          if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
-            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-          elif position != '' and un.strip() == curUn.strip():
-            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
-          else:
-            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-          scheduleHtml = scheduleHtml + "</tr>"  
-        else:
-          scheduleHtml = scheduleHtml + "<tr>"  
-          scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-          if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
-            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-          elif position != '' and un.strip() == curUn.strip():
-            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
-          else:
-            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-          scheduleHtml = scheduleHtml + "</tr>"  
-      else:
-        scheduleHtml = scheduleHtml + "<tr>"  
-        scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-        if chgReq == '1' and position != '' and un.strip() == curUn.strip(): 
-          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-        elif position != '' and un.strip() == curUn.strip():
-          scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + en + ',' + un + ',' + week + ');" ></i>  ' + position + '</td>'
-        else:
-          scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-        scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-        scheduleHtml = scheduleHtml + "</tr>"          
-
-  ## get and review ranking info
-  rankingResults = db_pullEventUserRank(en,roPwd)   
-  rankingInfo = [] ##[points][string]
-  reviewed = []
-
-###if FLB is enable
-## add fastlap to row selection
-## compare fast lap tp fast lap list for each week
-## if numbers match , add 10 points to tmpPoing.append for the week
-
-  for row in range(len(rankingResults)):
-    tmpPoints  = []
-    bonus      = 0
-    userNum    = rankingResults[row][0]
-    userFirst  = rankingResults[row][1]
-    userLast   = rankingResults[row][2]
-    userCar    = rankingResults[row][3]
-    fastLap    = rankingResults[row][6]
-    if userNum not in reviewed:
-      reviewed.append(userNum)
-      for row2 in range(len(rankingResults)):
-        if rankingResults[row2][0] == userNum:
-          tmpPoints.append(rankingResults[row2][4])
-      tmpPoints.sort()
-      if len(tmpPoints) == 13:
-        del tmpPoints[:5]
-      elif len(tmpPoints) == 12:
-        del tmpPoints[:4]
-      elif len(tmpPoints) == 11:
-        del tmpPoints[:3]
-      elif len(tmpPoints) == 10:
-        del tmpPoints[:2]
-      elif len(tmpPoints) == 9:
-        del tmpPoints[:1]
-      else:
-        pass
-
-      if fastLapEnabled:
-        bonus = 0
-        userFL = db_pullEventFastLapsForUser(en,userNum,roPwd)
-        for i in range(len(eventFastLabTimes)):
-          for j in range(len(userFL)):
-            try:
-              if eventFastLabTimes[i][1] == userFL[i][1]:
-                if i < 9:
-                  bonus = bonus + fl_bonus
-                  break
-                else:
-                  pass
-            except IndexError:
-              pass
-
-      pointSum = sum(tmpPoints) + bonus
-      rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
-  
-  rankingInfo.sort(reverse=True)
-    
-  rankingHTML = "<tr>"
-  rankingHTML = rankingHTML  + "<th>Rank</th>"
-  rankingHTML = rankingHTML  + "<th>Driver</th>"
-  rankingHTML = rankingHTML  + "<th>Car</th>"
-  rankingHTML = rankingHTML  + "<th>Points</th>"
-  rankingHTML = rankingHTML  + "</tr>"
-  for row in range(len(rankingInfo)):
-    points = rankingInfo[row][0]
-    driverInfo = rankingInfo[row][1].split('|')
-    driver = driverInfo[0] + ' ' + driverInfo[1]
-    car    = driverInfo[2]
-    rankingHTML = rankingHTML  + "<tr>"
-    rankingHTML = rankingHTML  + "<td>" + str(row     + 1) + "</td>"
-    rankingHTML = rankingHTML  + "<td>" + driver      + "</td>"
-    rankingHTML = rankingHTML  + "<td>" + car         + "</td>"
-    rankingHTML = rankingHTML  + "<td>" + str(points) + "</td>"
-    rankingHTML = rankingHTML  + "</tr>"
-
-  ##fill user results dropdown
-  userSelDropDownHtml = []
-  userPar = db_getEventParticipants(en,roPwd)
-  for i in range(len(userPar)):
-    if str(userPar[i][0]) == un:
-      userSelDropDownHtml.append('<option value="' + str(userPar[i][0]) + '">#' + str(userPar[i][0]) + ' - ' + userPar[i][1] + '</option>')
-  for i in range(len(userPar)):
-    if str(userPar[i][0]) != un:
-      userSelDropDownHtml.append('<option value="' + str(userPar[i][0]) + '">#' + str(userPar[i][0]) + ' - ' + userPar[i][1] + '</option>')
-      
-  return json.dumps({'schedule' : scheduleHtml, 'rankings': rankingHTML, 'eventName':eventBaseInfo[0], 'eventSeries':eventBaseInfo[1], 'driverSelect' : userSelDropDownHtml})
-
+  apiLog.info("PULL EVENT DETAILS EP")
+  parser       = request.args
+  un           = parser['userNum']
+  en           = parser['eventNum']
+  curUn        = parser['currentUserNum']
+  eventDetails = get_eventDetailInformation(un,en,curUn,fl_bonus,roPwd)
+  return json.dumps(
+                     {
+                       'schedule'     : eventDetails['scheduleHtml'], 
+                       'rankings'     : eventDetails['rankingHtml'], 
+                       'eventName'    : eventDetails['eventName'], 
+                       'eventSeries'  : eventDetails['eventSeries'], 
+                       'driverSelect' : eventDetails['driverSelectHtml']
+                     }
+                   )
 
 @app.route('/iComp/events/updateEventDisplayTable',methods=['GET'])
 def updateEventDisplayTable():
+  apiLog.info("UPDATE DISPLAY TABLE EP")
   parser    = request.args
   token     = parser['token']
   which     = parser['display']
   u         = parser['user']
-  getEvents = ""
-  if validateToken(token):    
-    if which == "act":
-      apiLog.info("Pulling event list for " + u)
-      getEvents = db_getRegisteredEvents(u,0,roPwd)
-    elif which == "fin":
-      apiLog.info("Pulling event list for " + u)
-      getEvents = db_getRegisteredEvents(u,1,roPwd)
-      
-    htmlStrBase = '''
-             <h2 class="mb-1 p-2 border-bottom border-primary text-light bg-dark">EVENTS</h2>
-             <select class="mb-1 float-left" id='eventTypeSelect' onChange="changeEventDisplayType();">
-             <option value="act">Active Events</option>
-             <option value="fin">Finished Events</option>
-             </select>
-             '''
-    htmlStr = '<table class="table" >'
-    htmlStr = htmlStr + '<thead class="bg-primary" ><tr>'
-    htmlStr = htmlStr + '<th scope="col" >Event Num</th>'
-    htmlStr = htmlStr + '<th scope="col" >Event Name</th>'
-    htmlStr = htmlStr + '<th scope="col" >iRacing Series</th>'
-    htmlStr = htmlStr + '<th scope="col" >Car Used</th>'
-    htmlStr = htmlStr + '<th scope="col" >View Details</th>'
-    htmlStr = htmlStr + '</tr></thead>'
-    htmlStr = htmlStr + '<tbody>'
-    for row in range(len(getEvents)):
-      htmlStr = htmlStr + '<tr>'
-      htmlStr = htmlStr + '<th scope="row">' + str(getEvents[row][0]) + '</th>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][1] + '</th>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][2] + '</td>'
-      htmlStr = htmlStr + '<td>' + getEvents[row][3] + '</td>'
-      htmlStr = htmlStr + '<td><button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="eventDetail(' + str(getEvents[row][0]) + ');">View Details</button></td>'   
-      htmlStr = htmlStr + '</tr>'
-    htmlStr = htmlStr + '</tbody>'
-    htmlStr = htmlStr + '</table>'
-
-    return json.dumps({'html':htmlStrBase + htmlStr})
-
+  htmlStr   = update_eventDetailsDisplayTable(u,which,token,roPwd)
+  return json.dumps(
+                     {
+                       'html' : htmlStr
+                     }
+                   )
 
 @app.route('/iComp/event/modify/getResultsPreModify', methods=['GET'])
 def pullResultsPreModify():
-  parser = request.args
-  token = parser['token']
-  event  = parser['eventNum']
-  user  = parser['userNum']
-  week = parser['week']
-  
-  if validateToken(token):
-    try:
-      results = db_getResultsForWeek(event,user,week,roPwd)
-      return json.dumps(results)
-    except Exception as e:
-      apiLog.error(str(e))
-      return {'success':False}
-  else:
-    return {'success':False}
-
+  apiLog.info("GET RESULTS PRE MODIFY EP")
+  parser     = request.args
+  token      = parser['token']
+  event      = parser['eventNum']
+  user       = parser['userNum']
+  week       = parser['week']
+  resultInfo = get_preModifiedEventDetails(user,event,week,token,roPwd)
+  return json.dumps(resultInfo)
 
 @app.route('/iComp/event/modify/reqChange', methods=['GET'])
 def addChangeReq():
-  parser = request.args
-  token  = parser['token']
-  event  = parser['eventNum']
-  user   = parser['userNum']
-  week   = parser['week']
-  pnt    = parser['pnt']
-  pos    = parser['pos']
-  inc    = parser['inc']
-
-  if validateToken(token):  
-    try:
-      oldResults = db_getResultsForWeek(event,user,week,roPwd)
-      cReq = db_addChangeReqToDB(event,user,week,pnt,pos,inc,oldResults['points'],oldResults['position'],oldResults['inc'],altPwd)
-      return json.dumps({"success" : cReq})
-    except Exception as e:
-      apiLog.error(str(e))
-      return {'success':False}
-  else:
-    return {'success':False}    
+  apiLog.info("REQUEST SCORE CHANGE EP")
+  parser      = request.args
+  token       = parser['token']
+  event       = parser['eventNum']
+  user        = parser['userNum']
+  week        = parser['week']
+  pnt         = parser['pnt']
+  pos         = parser['pos']
+  inc         = parser['inc']
+  makeRequest = set_eventWeekModifyTrue(event,user,week,pnt,pos,inc,token,roPwd,altPwd)
+  return json.dumps(makeRequest) 
       
-
 @app.route('/iComp/event/modify/getList', methods=['GET'])
 def getChangeReq():
-  rv = {}
-  chgList = db_getChgReqList(roPwd)
-  if len(chgList) < 1:
-    return json.dumps({'cnt' : 0})
-  else:
-    htmlStr = '<tr> <th>REQ NUM</th> <th>EVT NUM</th> <th>WK NUM</th> <th>USR NUM</th> <th>USR NAME</th> <th>PNT CHG</th> <th>POS CHG</th> <th>INC CHG</th> <th>ACTION</th> </tr>'
-    for i in range(len(chgList)):
-      htmlStr = htmlStr + '<tr>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][0]) + '</td>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][9]) + '</td>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][10]) + '</td>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][1]) + '</td>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][2]) + '</td>\n'
-      htmlStr = htmlStr + '<td>' + str(chgList[i][3]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][6]) + "</td>\n"
-      htmlStr = htmlStr + '<td>' + str(chgList[i][4]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][7]) + "</td>\n"
-      htmlStr = htmlStr + '<td>' + str(chgList[i][5]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][8]) + "</td>\n"
-      htmlStr = htmlStr + '<td><i class="far fa-check-square mr-2" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',true)"; ></i> <i class="far fa-times-circle mr-2" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',false)"; ></i></td>\n'
-      htmlStr = htmlStr + '</tr>\n'
-  
-  return json.dumps({'cnt' : len(chgList), 'html' : htmlStr})
+  apiLog.info("GET CHANGE REQUEST LIST EP")
+  changes = get_changeRequests(roPwd)
+  return json.dumps(
+                     {
+                       'cnt'  : changes['changeCnt'], 
+                       'html' : changes['html']
+                     }
+                   )
       
-
 @app.route('/iComp/event/modify/respond', methods=['POST'])
 def appDenyReq():
-  auth   = request.form['auth']
-  reqNum = request.form['reqNum']
-  appv   = request.form['appv']
-  if validateAdmToken(auth):
-    if int(appv) == 0:
-      try:
-        dbCall = db_approveChgReq(reqNum,altPwd)
-        return json.dumps({'success' : dbCall})
-      except Exception as e:
-        apiLog.error(str(e))
-        return json.dumps({'success' : False})
-    elif int(appv) == 1:
-      try:
-        dbCall = db_rejectChgReq(reqNum,altPwd)
-        return json.dumps({'success' : dbCall})
-      except Exception as e:
-        apiLog.error(str(e))
-        return json.dumps({'success' : False})  
-  else:
-    return json.dumps({'success' : False})
+  auth     = request.form['auth']
+  reqNum   = request.form['reqNum']
+  appv     = request.form['appv']
+  appvDeny = set_changeRequestResponse(reqNum,appv,auth,altPwd)
+  return json.dumps(
+                     {
+                       'success' : appvDeny
+                     }
+                   )
 ###################################################
 ### END EVENT END POINTS
 ################################################### 
