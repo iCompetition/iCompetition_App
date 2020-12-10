@@ -25,6 +25,7 @@ from iComp_db import *
 from iComp_user import *
 from iComp_event import *
 from iComp_eventModify import *
+from iComp_admin import *
 ###################################################
 ### END ICOMPETITION IMPORTS
 ###################################################
@@ -549,54 +550,42 @@ def appDenyReq():
 ###################################################
 ### START ADMINISTRATION END POINTS
 ################################################### 
+@app.route('/iComp/admin/clearTokens', methods=['POST'])  
+def adm_clearTokens():
+  auth = request.form['auth']
+  if validateAdmToken(auth):
+    clearAllTokens()
+  return "apiContected"
+
 @app.route('/iComp/admin/listUsers', methods=['POST'])
 def adm_listUsers():
-  auth = request.form['auth']
-  
-  if validateAdmToken(auth):
-    userList = db_listUsers(roPwd)
-    userCount = len(userList)
-    html = "<tr><th>UserName</th><th>UserNum</th></tr>"
-    for row in range(len(userList)):
-      html = html + "<tr><td>" + userList[row][0] + "</td><td>" + str(userList[row][1]) + "</td></tr>"
-    
-    return json.dumps({'result':True,'cnt':str(userCount),'html':html})
-  else:
-    return json.dumps({'result':False})
-    
+  apiLog.info("ADMIN - GET USER LIST EP")
+  auth     = request.form['auth']
+  userList = get_iCompUserList(auth,roPwd)
+  return json.dumps(
+                     { 
+                       'result' : userList['result'],
+                       'cnt'    : userList['userCnt'],
+                       'html'   : userList['userListHtml']
+                     }
+                   )
 
 @app.route('/iComp/admin/listEvents', methods=['POST'])
 def adm_listEvents():
-  auth = request.form['auth']
-  
-  if validateAdmToken(auth):
-    eventList = db_listEvents(roPwd)
-    eventCnt  = len(eventList)
-    html = """
-            <tr>
-              <th>Event</th>
-              <th>Series</th>
-              <th>EventNum</th>
-              <th>isLive?</th>
-            </tr>
-           """
-    for row in range(len(eventList)):
-      html = html + """
-                      <tr>
-                        <td>""" + eventList[row][0]      + """</td>
-                        <td>""" + eventList[row][1]      + """</td>
-                        <td>""" + str(eventList[row][2]) + """</td>
-                        <td>""" + str(eventList[row][3]) + """</td>
-                      </tr>
-                    """
-    
-    return json.dumps({'result':True,'cnt':str(eventCnt),'html':html})
-  else:
-    return json.dumps({'result':False})
-
+  apiLog.info("ADMIN - GET EVENT LIST EP")
+  auth      = request.form['auth']
+  eventList = get_iCompEventList(auth,roPwd)
+  return json.dumps(
+                     {
+                       'result' : eventList['result'],
+                       'cnt'    : eventList['eventCnt'],
+                       'html'   : eventList['eventListHtml']
+                     }
+                   )
 
 @app.route('/iComp/admin/createEvent', methods=['POST'])
 def adm_createEvent():
+  apiLog.info("ADMIN - CREATE EVENT EP")
   auth         = request.form['auth']
   evName       = request.form['en']
   evSeries     = request.form['es']
@@ -616,150 +605,67 @@ def adm_createEvent():
   cars         = request.form['cars']
   live         = request.form['live']
   fastLapBonus = request.form['fastLapBonus']
-  w13 = False
-  if validateAdmToken(auth):
-    if wk13t.lower() != "norace":
-      w13 = True
-    wkTracks = {
-                 '1'  : wk1t, 
-                 '2'  : wk2t, 
-                 '3'  : wk3t, 
-                 '4'  : wk4t, 
-                 '5'  : wk5t, 
-                 '6'  : wk6t, 
-                 '7'  : wk7t, 
-                 '8'  : wk8t, 
-                 '9'  : wk9t, 
-                 '10' : wk10t, 
-                 '11' : wk11t, 
-                 '12' : wk12t, 
-                 '13' : wk13t
-               }
-    try:
-      db_createEvent(evName,evSeries,wkTracks,w13,cars,live,altPwd,fastLapBonus)
-      return json.dumps({'result':True})
-    except Exception as e:
-      return json.dumps({'result':False,'message':str(e)})    
-
+  wkTracks = {
+               '1'  : wk1t, 
+               '2'  : wk2t, 
+               '3'  : wk3t, 
+               '4'  : wk4t, 
+               '5'  : wk5t, 
+               '6'  : wk6t, 
+               '7'  : wk7t, 
+               '8'  : wk8t, 
+               '9'  : wk9t, 
+               '10' : wk10t, 
+               '11' : wk11t, 
+               '12' : wk12t, 
+               '13' : wk13t
+             }
+  createEvent = create_newICompEvent(evName,evSeries,wkTracks,cars,live,fastLapBonus,auth,altPwd)
+  return json.dumps(
+                     {
+                       'result'  : createEvent['result'],
+                       'message' : createEvent['message']
+                     }
+                   )
     
-@app.route('/iComp/admin/clearTokens', methods=['POST'])  
-def adm_clearTokens():
-  auth = request.form['auth']
-  if validateAdmToken(auth):
-    clearAllTokens()
-  return "apiContected"
-  
-
 @app.route('/iComp/admin/getUserInfo', methods=['POST'])
 def adm_getUserInfo():
+  apiLog.info("ADMIN - GET USER INFO EP")
   auth     = request.form['auth']
   userName = request.form['un']
   html = "<tr><th>Col</th><th>Val</th></tr>"
-  if validateAdmToken(auth):
-    userInfo = db_getUserInfoForAdmin(userName,roPwd)
-    html = html + "<tr><td>USERNAME:</td><td>" + str(userInfo['userName']) + "</td></tr>"
-    html = html + "<tr><td>USERNUM:</td><td>"  + str(userInfo['userNum']) + "</td></tr>"
-    html = html + "<tr><td>FULLNAME:</td><td>" + str(userInfo['name']) + "</td></tr>"
-    html = html + "<tr><td>EMAIL:</td><td>"    + str(userInfo['email']) + "</td></tr>"
-    html = html + "<tr><td>ISADMIN:</td><td>"  + str(userInfo['isAdm']) + "</td></tr>"
-    html = html + "<tr><td>EVENTCNT:</td><td>" + str(userInfo['eventCount']) + "</td></tr>"
-    return json.dumps({'result':True,'html':html})
-  else:
-    return json.dumps({'result':False})
+  userInfo = get_iCompUserInformation(userName,auth,roPwd)
+  return json.dumps(
+                     {
+                       'result' : userInfo['result'],
+                       'html'   : userInfo['html']
+                     }
+                   )
 
 
 @app.route('/iComp/admin/getActiveEvents', methods=['POST'])
 def adm_getActiveEvents():
-  auth = request.form['auth']
-  if validateAdmToken(auth):
-    eventList = db_listEvents_active(roPwd)
-    html = """
-            <tr>
-              <th>Event</th>
-              <th>EventNum</th>
-              <th>Finish</th>
-            </tr>
-           """
-    for row in range(len(eventList)):
-      html = html + """
-                      <tr>
-                        <td>""" + str(eventList[row][0])      + """</td>
-                        <td>""" + str(eventList[row][1])      + """</td>
-                        <td>""" + """<button type=\"submit\" class=\"mt-2 mb-3 btn btn-outline-primary btn-lg w-100\" onClick=\"adm_finishEvent('""" + str(eventList[row][1]) + """');\" >Finish</button> """ + """</td>
-                      </tr>
-                    """
-    
-    return json.dumps({'result':True,'html':html})
-  else:
-    return json.dumps({'result':False})    
-
-
+  apiLog.info("ADMIN - GET ACTIVE EVENT INFO EP")
+  auth      = request.form['auth']
+  eventList = get_activeICompEvents(auth,roPwd)
+  return json.dumps(
+                     {
+                       'result': eventList['result'],
+                       'html'  : eventList['html']
+                     }
+                   )
+  
 @app.route('/iComp/admin/finishEvent', methods=['POST'])
 def adm_finishEvent():
   auth           = request.form['auth']
   eventNum       = request.form['event']
-  rankingResults = db_pullEventUserRank(eventNum,roPwd)
-  rankingInfo    = []
-  reviewed       = []
-  eventBaseInfo = db_getEventBaseInfo(eventNum,roPwd)
-  ##Set FLB enabled/disabled
-  fastLapEnabled = False
-  if str(eventBaseInfo[2]) == "1":
-    fastLapEnabled = True
+  finishEvent    = set_iCompEventAsFinished(eventNum,fl_bonus,auth,roPwd,altPwd)
+  return json.dumps(
+                    {
+                      'result':finishEvent
+                   }
+                 )
   
-  for row in range(len(rankingResults)):
-    tmpPoints  = []
-    bonus      = 0
-    userNum    = rankingResults[row][0]
-    userFirst  = rankingResults[row][1]
-    userLast   = rankingResults[row][2]
-    userCar    = rankingResults[row][3]
-    fastLap    = rankingResults[row][6]
-    if userNum not in reviewed:
-      reviewed.append(userNum)
-      for row2 in range(len(rankingResults)):
-        if rankingResults[row2][0] == userNum:
-          tmpPoints.append(rankingResults[row2][4])
-      tmpPoints.sort()
-      if len(tmpPoints) == 13:
-        del tmpPoints[:5]
-      elif len(tmpPoints) == 12:
-        del tmpPoints[:4]
-      elif len(tmpPoints) == 11:
-        del tmpPoints[:3]
-      elif len(tmpPoints) == 10:
-        del tmpPoints[:2]
-      elif len(tmpPoints) == 9:
-        del tmpPoints[:1]
-      else:
-        pass
-
-      if fastLapEnabled:
-        bonus = 0
-        userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
-        for i in range(len(eventFastLabTimes)):
-          for j in range(len(userFL)):
-            try:
-              if eventFastLabTimes[i][1] == userFL[i][1]:
-                if i < 9:
-                  bonus = bonus + fl_bonus
-                  break
-                else:
-                  pass
-            except IndexError:
-              pass
-
-  pointSum = sum(tmpPoints) + bonus
-  rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
-  rankingInfo.sort(reverse=True)
-  driverInfo = rankingInfo[0][1].split('|')
-  driver = driverInfo[0] + ' ' + driverInfo[1]
-
-  if validateAdmToken(auth):  
-    finishEvent = db_finishEvent(eventNum, userNum, driver, altPwd)
-    return json.dumps({'result':finishEvent})
-  else:
-    return json.dumps({'result':False})
 ###################################################
 ### END ADMINISTRATION END POINTS
 ################################################### 
