@@ -28,7 +28,7 @@ ensureTokenDirsExist()
 
 ##config setup
 confDict = getConf()
-fl_bonus = int(confDict['fastLabBonusAmount'])
+fl_bonus = int(confDict['fastLapBonusAmount'])
 
 ##Host Run Info Variables
 app = Flask(__name__)
