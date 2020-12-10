@@ -16,6 +16,7 @@ dirsToCreate   = [
                  '/usr/local/lib/iCompetition/api',
                  '/usr/local/lib/iCompetition/python',
                  '/usr/local/lib/iCompetition/python/crypt',
+                 '/usr/local/lib/iCompetition/python/scripts',
                  '/usr/local/lib/iCompetition/.tokens',
                  '/usr/local/lib/iCompetition/.tokens/.adm',
                  '/usr/local/lib/iCompetition/.tokens/.pwd',
