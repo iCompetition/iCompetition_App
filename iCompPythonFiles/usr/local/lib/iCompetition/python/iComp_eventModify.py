@@ -11,12 +11,12 @@ from iComp_db import *
 from iComp_util import *
 
 ##logging
-apiLog = logging.getLogger('APILOG')
-apiLog.setLevel(logging.DEBUG)
-logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/api.log', maxBytes=100000, backupCount=10)
+eventModFuncLog = logging.getLogger('eventModFuncLog')
+eventModFuncLog.setLevel(logging.DEBUG)
+logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/eventModifyFunctions.log', maxBytes=100000, backupCount=10)
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 logHandler.setFormatter(formatter)
-apiLog.addHandler(logHandler)
+eventModFuncLog.addHandler(logHandler)
 
 ##Functions
 def get_preModifiedEventDetails(userNum,eventNum,weekNum,token,roPwd):
@@ -37,26 +37,23 @@ def get_preModifiedEventDetails(userNum,eventNum,weekNum,token,roPwd):
     position
     inc  
   """
-  apiLog.info("get_preModifiedEventDetails - checking auth token")
+  eventModFuncLog.info("get_preModifiedEventDetails - checking auth token")
   if not validateToken(token):
-    apiLog.warning("get_preModifiedEventDetails - invalid auth token used")
+    eventModFuncLog.warning("get_preModifiedEventDetails - invalid auth token used")
     return {
              'success' : False
            }
+  else:
     try:
-      apiLog.info("get_preModifiedEventDetails - pulling information")
+      eventModFuncLog.info("get_preModifiedEventDetails - pulling information")
       results = db_getResultsForWeek(eventNum,userNum,weekNum,roPwd)
       return results
     except Exception as e:
-      apiLog.error("get_preModifiedEventDetails - an error has occured")
-      apiLog.error("get_preModifiedEventDetails - ERROR: " + str(e))
+      eventModFuncLog.error("get_preModifiedEventDetails - an error has occured")
+      eventModFuncLog.error("get_preModifiedEventDetails - ERROR: " + str(e))
       return {
                'success' : False
              }
-  else:
-    return {
-             'success' : False
-           }
 
 
 def get_changeRequests(roPwd):
@@ -67,7 +64,7 @@ def get_changeRequests(roPwd):
       changeCnt/int - number of requests
       html/string   - html for display 
   """
-  apiLog.info("get_changeRequestsHtml - pulling requested changes")
+  eventModFuncLog.info("get_changeRequestsHtml - pulling requested changes")
   chgList = db_getChgReqList(roPwd)
   if len(chgList) < 1:
     return {
@@ -109,26 +106,26 @@ def set_eventWeekModifyTrue(eventNum,userNum,weekNum,points,position,incidents,t
     success/boolean - function sucess
     message/string  - function success message
   """
-  apiLog.info("get_preModifiedEventDetails - validating token")
+  eventModFuncLog.info("get_preModifiedEventDetails - validating token")
   if not validateToken(token):  
-    apiLog.warning("get_preModifiedEventDetails - invalid token used!")
+    eventModFuncLog.warning("get_preModifiedEventDetails - invalid token used!")
     return {
              'success' : False,
              'message' : "Invalid or expired token was used"
            }
   else:
     try:
-      apiLog.info("get_preModifiedEventDetails - pulling current week scores")
+      eventModFuncLog.info("get_preModifiedEventDetails - pulling current week scores")
       oldResults = db_getResultsForWeek(eventNum,userNum,weekNum,roPwd)
-      apiLog.info("get_preModifiedEventDetails - adding modification request to DB")
+      eventModFuncLog.info("get_preModifiedEventDetails - adding modification request to DB")
       cReq = db_addChangeReqToDB(eventNum,userNum,weekNum,points,position,incidents,oldResults['points'],oldResults['position'],oldResults['inc'],altPwd)
       return {
                'success' : cReq,
                'message' : 'modification request entered'
              }
     except Exception as e:
-      apiLog.error("get_preModifiedEventDetails - error occured adding request to database")
-      apiLog.error("get_preModifiedEventDetails - ERROR: " + str(e))
+      eventModFuncLog.error("get_preModifiedEventDetails - error occured adding request to database")
+      eventModFuncLog.error("get_preModifiedEventDetails - ERROR: " + str(e))
       return {
                'success' : False,
                'message' : 'ERROR: ' + str(e)
@@ -145,9 +142,9 @@ def set_changeRequestResponse(requestNum,approvalStatus,admToken,altPwd):
   OUTPUT
     success/boolean    - function success
   """
-  apiLog.info("set_changeRequestResponse - validating token")
+  eventModFuncLog.info("set_changeRequestResponse - validating token")
   if not validateAdmToken(admToken):
-    apiLog.warning("set_changeRequestResponse - someone tried to approve change request with invalid or expired administrator token!")
+    eventModFuncLog.warning("set_changeRequestResponse - someone tried to approve change request with invalid or expired administrator token!")
     return False
   else:
     if int(approvalStatus) == 0:
@@ -155,17 +152,17 @@ def set_changeRequestResponse(requestNum,approvalStatus,admToken,altPwd):
         dbCall = db_approveChgReq(requestNum,altPwd)
         return dbCall
       except Exception as e:
-        apiLog.error("set_changeRequestResponse - error approving change request")
-        apiLog.error("set_changeRequestResponse - ERROR: " + str(e))     
+        eventModFuncLog.error("set_changeRequestResponse - error approving change request")
+        eventModFuncLog.error("set_changeRequestResponse - ERROR: " + str(e))     
         return False   
     elif int(approvalStatus) == 1:
       try:
         dbCall = db_rejectChgReq(requestNum,altPwd)
         return dbCall
       except Exception as e:
-        apiLog.error("set_changeRequestResponse - error approving change request")
-        apiLog.error("set_changeRequestResponse - ERROR: " + str(e))     
+        eventModFuncLog.error("set_changeRequestResponse - error approving change request")
+        eventModFuncLog.error("set_changeRequestResponse - ERROR: " + str(e))     
         return False
     else:
-      apiLog.error("set_changeRequestResponse - an invalid approval status of " + str(approvalStatus) + " wass provided")
+      eventModFuncLog.error("set_changeRequestResponse - an invalid approval status of " + str(approvalStatus) + " wass provided")
       return False

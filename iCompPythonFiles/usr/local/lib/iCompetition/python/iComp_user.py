@@ -11,12 +11,12 @@ from iComp_db import *
 from iComp_util import *
 
 ##logging
-apiLog = logging.getLogger('APILOG')
-apiLog.setLevel(logging.DEBUG)
-logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/api.log', maxBytes=100000, backupCount=10)
+userFuncLog = logging.getLogger('userFuncLog')
+userFuncLog.setLevel(logging.DEBUG)
+logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/userFunctions.log', maxBytes=100000, backupCount=10)
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 logHandler.setFormatter(formatter)
-apiLog.addHandler(logHandler)
+userFuncLog.addHandler(logHandler)
 
 ##Functions
 def create_iCompAccount(uName,fName,lName,pwd,email,altPwd):
@@ -33,23 +33,23 @@ def create_iCompAccount(uName,fName,lName,pwd,email,altPwd):
       result/boolean - did the account get created correctly
       message/string  - information about the success code
   """
-  apiLog.info("create_iCompAccount - checking email formatting")
+  userFuncLog.info("create_iCompAccount - checking email formatting")
   if not iCompUtils_validateEmail(email):
-    apiLog.info("create_iCompAccount - invalid email formatting")
+    userFuncLog.info("create_iCompAccount - invalid email formatting")
     return {'result' : False, 'message' : 'invalid email format'}
   else:
-    apiLog.info("create_iCompAccount - email OKAY")
-    apiLog.info("create_iCompAccount - Create accout attempt:")
-    apiLog.info("\tUN:" + uName)
-    apiLog.info("\tFN:" + fName)
-    apiLog.info("\tLN:" + lName)    
+    userFuncLog.info("create_iCompAccount - email OKAY")
+    userFuncLog.info("create_iCompAccount - Create accout attempt:")
+    userFuncLog.info("\tUN:" + uName)
+    userFuncLog.info("\tFN:" + fName)
+    userFuncLog.info("\tLN:" + lName)    
     createUser = db_createAccount(uName,fName,lName,pwd,email,altPwd)
     if not createUser['result']:
-      apiLog.info("create_iCompAccount - create acct failed")
-      apiLog.info("create_iCompAccount - " + createUser['message'])
+      userFuncLog.info("create_iCompAccount - create acct failed")
+      userFuncLog.info("create_iCompAccount - " + createUser['message'])
       return {'result':False,'message':createUser['message']}
     elif createUser['result']:
-      apiLog.info("create_iCompAccount - create acct sucess")
+      userFuncLog.info("create_iCompAccount - create acct sucess")
       return {'result':True,'message':createUser['message']}
 
 
@@ -65,11 +65,11 @@ def validate_iCompUser(uname,pwd,roPwd):
       message/string - information about the success code
       token/string   - access token for user, if login was successful
   """
-  apiLog.info("validate_iCompUser - checking user for login")
+  userFuncLog.info("validate_iCompUser - checking user for login")
   userLogin = db_loginUser(uname,pwd,roPwd)
   if userLogin:
-    apiLog.info("validate_iCompUser - valid login for " + uname)
-    apiLog.info("validate_iCompUser - generating token for " + uname)
+    userFuncLog.info("validate_iCompUser - valid login for " + uname)
+    userFuncLog.info("validate_iCompUser - generating token for " + uname)
     token = generateToken()
     return {
              'result'  : True, 
@@ -77,7 +77,7 @@ def validate_iCompUser(uname,pwd,roPwd):
              'token'   : token
             }
   else:
-    apiLog.info("validate_iCompUser - failed login for " + uname)
+    userFuncLog.info("validate_iCompUser - failed login for " + uname)
     return {
          'result'  : False, 
          'message' : 'Username or password was incorrect',
@@ -94,13 +94,13 @@ def get_iCompUserInfo(username,token,roPwd):
   OUTPUT
     userInfo/Dict
   """
-  apiLog.info("get_iCompUserInfo - checking auth token")
+  userFuncLog.info("get_iCompUserInfo - checking auth token")
   if not validateToken(token):
-    apiLog.warning("get_iCompUserInfo - invalid or expired token used")
+    userFuncLog.warning("get_iCompUserInfo - invalid or expired token used")
     return False
   else:
-    apiLog.info("get_iCompUserInfo - authorized token")
-    apiLog.info("get_iCompUserInfo - pulling info for " + username)
+    userFuncLog.info("get_iCompUserInfo - authorized token")
+    userFuncLog.info("get_iCompUserInfo - pulling info for " + username)
     userInfo = db_getUsrInfo(username,roPwd)
     return userInfo
 
@@ -115,20 +115,20 @@ def set_iCompUserPassword(username,pwd,token,altPwd):
   OUTPUT
     result/boolean  - change successful
   """
-  apiLog.info("set_iCompUserPassword - checking auth token")
-  if not validateToken(token):  
-    apiLog.warning("set_iCompUserPassword - invalid or expired token used")
-    apiLog.warning("set_iCompUserPassword - invalid token used to attempt pwd change for " + username + "!")
+  userFuncLog.info("set_iCompUserPassword - checking auth token")
+  if not validatePwdToken(token) and not validateToken(token) :  
+    userFuncLog.warning("set_iCompUserPassword - invalid or expired token used")
+    userFuncLog.warning("set_iCompUserPassword - invalid token used to attempt pwd change for " + username + "!")
     return False
   else:
-    apiLog.info("set_iCompUserPassword - authorized token")
+    userFuncLog.info("set_iCompUserPassword - authorized token")
     chgPass = db_changePass(pwd,username,altPwd)
     if chgPass:
-      apiLog.info("set_iCompUserPassword - pwd changed for " + username)
+      userFuncLog.info("set_iCompUserPassword - pwd changed for " + username)
       clearToken(token)
       return True
     else:
-      apiLog.info("set_iCompUserPassword - failed pwd changed for " + username)
+      userFuncLog.info("set_iCompUserPassword - failed pwd changed for " + username)
       return False
 
 
@@ -142,19 +142,19 @@ def set_iCompUserEmail(username,email,token,altPwd):
   OUTPUT
     result/boolean  - change successful  
   """
-  apiLog.info("set_iCompUserEmail - checking auth token")
+  userFuncLog.info("set_iCompUserEmail - checking auth token")
   if not validateToken(token):  
-    apiLog.warning("set_iCompUserEmail - invalid or expired token used")
-    apiLog.warning("set_iCompUserEmail - invalid token used to attempt email change for " + username + "!")
+    userFuncLog.warning("set_iCompUserEmail - invalid or expired token used")
+    userFuncLog.warning("set_iCompUserEmail - invalid token used to attempt email change for " + username + "!")
     return False
   else:
-    apiLog.info("set_iCompUserEmail - authorized token")
-    chgPass = db_changeEmail(email,userName,altPwd)
+    userFuncLog.info("set_iCompUserEmail - authorized token")
+    chgPass = db_changeEmail(email,username,altPwd)
     if chgPass:
-      apiLog.info("set_iCompUserEmail - email changed for " + username)
+      userFuncLog.info("set_iCompUserEmail - email changed for " + username)
       clearToken(token)
       return True
     else:
-      apiLog.info("set_iCompUserEmail - failed email changed for " + username)
+      userFuncLog.info("set_iCompUserEmail - failed email changed for " + username)
       return False  
 

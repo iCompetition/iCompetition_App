@@ -11,12 +11,12 @@ from iComp_db import *
 from iComp_util import *
 
 ##logging
-apiLog = logging.getLogger('APILOG')
-apiLog.setLevel(logging.DEBUG)
-logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/api.log', maxBytes=100000, backupCount=10)
+adminFuncLog = logging.getLogger('adminFuncLog')
+adminFuncLog.setLevel(logging.DEBUG)
+logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/adminfunctions.log', maxBytes=100000, backupCount=10)
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 logHandler.setFormatter(formatter)
-apiLog.addHandler(logHandler)
+adminFuncLog.addHandler(logHandler)
 
 ##Functions
 def get_iCompUserList(admToken,roPwd):
@@ -30,17 +30,18 @@ def get_iCompUserList(admToken,roPwd):
       userCount/int       - total count of users
       userListHtml/string - html for populating user list
   """
-  apiLog.info("get_iCompUserList - checking auth token")
+  userListHtml = ""
+  adminFuncLog.info("get_iCompUserList - checking auth token")
   if not validateAdmToken(admToken):
-    apiLog.warning("get_iCompUserList - invalid auth token used!")
-    apiLog.warning("get_iCompUserList - invalid or expired admin token used to pull user list")
+    adminFuncLog.warning("get_iCompUserList - invalid auth token used!")
+    adminFuncLog.warning("get_iCompUserList - invalid or expired admin token used to pull user list")
     return {
              'result'       : False,
              'userCnt'      : 0,
              'userListHtml' : "invalid token"
            }    
   else:
-    apiLog.info("get_iCompUserList - checking auth token")
+    adminFuncLog.info("get_iCompUserList - checking auth token")
     userList     = db_listUsers(roPwd)
     userCount    = len(userList)
     userListHtml = "<tr><th>UserName</th><th>UserNum</th></tr>"
@@ -65,20 +66,20 @@ def get_iCompEventList(admToken,roPwd):
       eventCnt/int        - total count of users
       eventListHtml/string - html for populating user list
   """
-  apiLog.info("get_iCompEventList - checking auth token")
+  adminFuncLog.info("get_iCompEventList - checking auth token")
   if not validateAdmToken(admToken):
-    apiLog.warning("get_iCompEventList - invalid auth token used!")
-    apiLog.warning("get_iCompEventList - invalid or expired admin token used to pull user list")
+    adminFuncLog.warning("get_iCompEventList - invalid auth token used!")
+    adminFuncLog.warning("get_iCompEventList - invalid or expired admin token used to pull user list")
     return {
              'result'       : False,
              'eventCnt'      : 0,
              'eventListHtml' : "invalid token"
            }    
   else:
-    apiLog.info("get_iCompEventList - pulling event list")
+    adminFuncLog.info("get_iCompEventList - pulling event list")
     eventList = db_listEvents(roPwd)
     eventCnt  = len(eventList)
-    apiLog.info("get_iCompEventList - generating html")
+    adminFuncLog.info("get_iCompEventList - generating html")
     eventListHtml = """
                      <tr>
                        <th>Event</th>
@@ -114,11 +115,11 @@ def get_iCompUserInformation(userName,token,roPwd):
       result/boolean - function success
       html           - html for user info to display
   """
-  apiLog.info("get_iCompUserInformation - validating token")
+  adminFuncLog.info("get_iCompUserInformation - validating token")
   if validateAdmToken(token):
-    apiLog.info("get_iCompUserInformation - pulling info for account: " + userName)
+    adminFuncLog.info("get_iCompUserInformation - pulling info for account: " + userName)
     userInfo = db_getUserInfoForAdmin(userName,roPwd)
-    apiLog.info("get_iCompUserInformation - building html")
+    adminFuncLog.info("get_iCompUserInformation - building html")
     html = "<tr><th>Col</th><th>Val</th></tr>"
     html = html + "<tr><td>USERNAME:</td><td>" + str(userInfo['userName']) + "</td></tr>"
     html = html + "<tr><td>USERNUM:</td><td>"  + str(userInfo['userNum']) + "</td></tr>"
@@ -131,8 +132,8 @@ def get_iCompUserInformation(userName,token,roPwd):
             'html'   : html
            }
   else:
-    apiLog.warning("get_iCompUserInformation - invalid auth token used!")
-    apiLog.warning("get_iCompUserInformation - invalid or expired admin token used to pull user info")
+    adminFuncLog.warning("get_iCompUserInformation - invalid auth token used!")
+    adminFuncLog.warning("get_iCompUserInformation - invalid or expired admin token used to pull user info")
     return {
             'result' : False,
             'html'   : "invalid auth"
@@ -149,18 +150,18 @@ def get_activeICompEvents(token,roPwd):
         result/boolean - function success
         html/string    - list html to display
   """
-  apiLog.info("get_activeICompEvents - validating token")
+  adminFuncLog.info("get_activeICompEvents - validating token")
   if not validateAdmToken(token):
-    apiLog.warning("get_activeICompEvents - invalid auth token used!")
-    apiLog.warning("get_activeICompEvents - invalid or expired admin token used to pull active event info")
+    adminFuncLog.warning("get_activeICompEvents - invalid auth token used!")
+    adminFuncLog.warning("get_activeICompEvents - invalid or expired admin token used to pull active event info")
     return {
             'result' : False,
             'html'   : "invalid auth"
            }
   else:
-    apiLog.info("get_activeICompEvents - pulling event list")
+    adminFuncLog.info("get_activeICompEvents - pulling event list")
     eventList = db_listEvents_active(roPwd)
-    apiLog.info("get_activeICompEvents - building html")
+    adminFuncLog.info("get_activeICompEvents - building html")
     html = """
             <tr>
               <th>Event</th>
@@ -199,10 +200,10 @@ def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enable
       message/string   - message for function success
   """
   w13 = False
-  apiLog.info("create_newICompEvent - checking auth token")
+  adminFuncLog.info("create_newICompEvent - checking auth token")
   if not validateAdmToken(admToken):
-    apiLog.warning("create_newICompEvent - invalid auth token used!")
-    apiLog.warning("create_newICompEvent - invalid or expired admin token used to create new event!")  
+    adminFuncLog.warning("create_newICompEvent - invalid auth token used!")
+    adminFuncLog.warning("create_newICompEvent - invalid or expired admin token used to create new event!")  
     return { 
              'result'  : False,
              'message' : "invalid or expired token used"
@@ -215,8 +216,8 @@ def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enable
                'message' : "Event Created"
              }      
     except Exception as e:
-      apiLog.error("create_newICompEvent - en error occured creating event")                                 
-      apiLog.error("create_newICompEvent - ERROR: " + str(e))        
+      adminFuncLog.error("create_newICompEvent - en error occured creating event")                                 
+      adminFuncLog.error("create_newICompEvent - ERROR: " + str(e))        
       return { 
                'result'  : False,
                'message' : "ERROR: " + str(e)
@@ -233,10 +234,10 @@ def set_iCompEventAsFinished(eventNum,fl_bonus,token,roPwd,altPwd):
   OUTPUT
     result/boolean - function success
   """
-  apiLog.info("set_iCompEventAsFinished - validating auth token")
+  adminFuncLog.info("set_iCompEventAsFinished - validating auth token")
   if not validateAdmToken(token):
-    apiLog.warning("set_iCompEventAsFinished - invalid auth token used!")
-    apiLog.warning("set_iCompEventAsFinished - invalid or expired admin token used to finish event!")  
+    adminFuncLog.warning("set_iCompEventAsFinished - invalid auth token used!")
+    adminFuncLog.warning("set_iCompEventAsFinished - invalid or expired admin token used to finish event!")  
     return False,
   else:
     rankingResults    = db_pullEventUserRank(eventNum,roPwd)

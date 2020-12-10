@@ -78,7 +78,7 @@ def db_createAccount(userName,firstName,lastName,pwd,email,rights):
     pwd = dbHasher(pwd) ##has pwd
     ##attmpt to add new user to database.
     try:
-      cr.execute("insert into users values ('" + userName + "','" + firstName + "','" + lastName + "','" + pwd + "',0," + str(userNum) + ",'" + email + "');")
+      cr.execute("insert into users values ('" + userName + "','" + firstName + "','" + lastName + "','" + pwd + "',0," + str(userNum) + ",'" + email + "',0);")
     except Exception as e:
       _dbClose(db,cr)
       return {'result':False,'message':str(e)}
@@ -247,6 +247,7 @@ def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,rights):
   cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0,'" + lap + "');")
   cr.execute("insert into topLap values(" + eventNum + "," + wkNum + "," + userName + ",'" + lap + "');")
   _dbClose(db,cr)
+  return True
 
 
 def db_getEventBaseInfo(eventNum,rights):
@@ -364,7 +365,7 @@ def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus):
     eventNum = 1
   else:
     eventNum = (result[0][0] + 1)  
-  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + "," + str(fastLapBonus) + ");")
+  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + "," + str(fastLapBonus) + ",0,'');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",1,'"  + wkTracks['1'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",2,'"  + wkTracks['2'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",3,'"  + wkTracks['3'] + "');")

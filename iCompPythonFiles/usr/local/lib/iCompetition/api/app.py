@@ -53,7 +53,7 @@ ensureTokenDirsExist()
 
 #2) CONFIG INFO PULL
 confDict = getConf()
-fl_bonus = int(confDict['fastLabBonusAmount'])
+fl_bonus = int(confDict['fastLapBonusAmount'])
 
 #3) API HOST RUN  VARIABLES
 app = Flask(__name__)
@@ -186,7 +186,7 @@ def createAccount():
   createAcct = create_iCompAccount(uName,fName,lName,pwd,email,altPwd)
   return json.dumps(
                      {
-                       'result'  : createAcct['results'],
+                       'result'  : createAcct['result'],
                        'message' : createAcct['message']
                      }
                     )
@@ -409,7 +409,7 @@ def registerForEvent():
   userNum  = parser['userNum']
   car      = parser['car']
   t        = parser['token']
-  register = set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,token,altPwd)
+  register = set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,t,altPwd)
   return json.dumps(
                      {
                        'result'  : register['result'],

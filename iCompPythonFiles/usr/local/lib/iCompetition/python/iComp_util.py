@@ -57,7 +57,7 @@ def iCompUtils_validateEmail(email):
 ##password reset email
 def sendPassResetEmail(email, userName, token):
   conf   = getConf()
-  domain = conf['emailDomain']
+  domain = conf['emailLink']
   mail_content = """
                  <html><head></head>
                    <body>

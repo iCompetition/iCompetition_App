@@ -11,12 +11,12 @@ from iComp_db import *
 from iComp_util import *
 
 ##logging
-apiLog = logging.getLogger('APILOG')
-apiLog.setLevel(logging.DEBUG)
-logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/api.log', maxBytes=100000, backupCount=10)
+eventFuncLog = logging.getLogger('eventFuncLog')
+eventFuncLog.setLevel(logging.DEBUG)
+logHandler = logging.handlers.RotatingFileHandler('/var/log/iComp/eventFunctions.log', maxBytes=100000, backupCount=10)
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
 logHandler.setFormatter(formatter)
-apiLog.addHandler(logHandler)
+eventFuncLog.addHandler(logHandler)
 
 ##Functions
 def get_eventCountForUser(username,token,roPwd):
@@ -28,12 +28,12 @@ def get_eventCountForUser(username,token,roPwd):
   OUTPUT
     eventCnt/int    - number events account is registered for
   """
-  apiLog.info("get_iCompUserEventCount - checking auth token")
+  eventFuncLog.info("get_iCompUserEventCount - checking auth token")
   if not validateToken(token):
-    apiLog.info("get_iCompUserEventCount - token invalid or expired")
+    eventFuncLog.info("get_iCompUserEventCount - token invalid or expired")
     return False
   else:
-    eventList = db_getLiveEvents(username,roPwd) 
+    eventList = db_getRegisteredEvents(username,0,roPwd) 
     return len(eventList)
 
 
@@ -51,20 +51,20 @@ def get_liveEventHtmlForUser(username,token,roPwd):
 
   """
   htmlStr = ""  
-  apiLog.info("get_liveEventHtmlForUser - checking auth token")
+  eventFuncLog.info("get_liveEventHtmlForUser - checking auth token")
   if not validateToken(token):
-    apiLog.info("get_liveEventHtmlForUser - invalid or expired token")
-    apiLog.warning("get_liveEventHtmlForUser - live event information pull was attempted for " + username + " using an invalid token")
+    eventFuncLog.info("get_liveEventHtmlForUser - invalid or expired token")
+    eventFuncLog.warning("get_liveEventHtmlForUser - live event information pull was attempted for " + username + " using an invalid token")
     return {
              'result'  : False,
              'message' : "invalid or expired auth token.  Please log back in to iCompeition",
              'html'    : ""
            }
   else:
-    apiLog.info("get_liveEventHtmlForUser - pulling live event information")
+    eventFuncLog.info("get_liveEventHtmlForUser - pulling live event information")
     eventList = db_getLiveEvents(username,roPwd) 
     if len(eventList) > 0:
-      apiLog.info("get_liveEventHtmlForUser - building html for " + username)
+      eventFuncLog.info("get_liveEventHtmlForUser - building html for " + username)
       for row in range(len(eventList)):
         name = eventList[row][0]
         num  = eventList[row][1]
@@ -91,7 +91,7 @@ def get_carListForEvent(eventNum,roPwd):
     htmlStr/string - html output for event cars list
   """
   htmlStr = ""
-  apiLog.info("get_carListForEvent - pulling cars for event #" + str(eventNum))
+  eventFuncLog.info("get_carListForEvent - pulling cars for event #" + str(eventNum))
   carList = db_getEventCars(eventNum,roPwd)
   for row in range(len(carList)):
     htmlStr = htmlStr + "<option value='" + carList[row][0] + "'>" + carList[row][0] + "</option>"  
@@ -115,14 +115,14 @@ def get_registeredEventsForUser(username,runningOrFinished,token,roPwd):
   htmlStr  = ""
   htmlStr2 = ""
   if not validateToken(token):
-    apiLog.info("get_registeredEventsForUser - invalid or expired token")
+    eventFuncLog.info("get_registeredEventsForUser - invalid or expired token")
     return {
              'html1' : 'invalid auth',
              'html2' : 'invalid auth'
            } 
   else:
     eventList = db_getRegisteredEvents(username,runningOrFinished,roPwd)
-    apiLog.info("get_registeredEventsForUser - building html")
+    eventFuncLog.info("get_registeredEventsForUser - building html")
     htmlStr = '<table class="table" >'
     htmlStr = htmlStr + '<thead class="bg-primary" ><tr>'
     htmlStr = htmlStr + '<th scope="col" >Event Num</th>'
@@ -138,7 +138,7 @@ def get_registeredEventsForUser(username,runningOrFinished,token,roPwd):
       htmlStr = htmlStr + '<td>' + eventList[row][1] + '</th>'
       htmlStr = htmlStr + '<td>' + eventList[row][2] + '</td>'
       htmlStr = htmlStr + '<td>' + eventList[row][3] + '</td>'
-      htmlStr = htmlStr + '<td><button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="eventDetail(' + str(getEvents[row][0]) + ');">View Details</button></td>'   
+      htmlStr = htmlStr + '<td><button type="button" class="mt-2 btn btn-outline-primary btn-sm w-100" onClick="eventDetail(' + str(eventList[row][0]) + ');">View Details</button></td>'   
       htmlStr = htmlStr + '</tr>'
       htmlStr2 = htmlStr2 + "<option value='" + str(eventList[row][0]) + "'>" + eventList[row][1] + "</option>"
     htmlStr = htmlStr + '</tbody>'
@@ -160,9 +160,10 @@ def get_eventUnscoredWeeksForUser(eventNum,userName,roPwd):
     htmlStr/string  - html for week logging list
   """
   htmlStr = ""
-  apiLog.info("get_eventUnscoredWeeksForUser - getting unscored weeks for " + userName)
+  eventFuncLog.info("get_eventUnscoredWeeksForUser - getting unscored weeks for " + userName)
+  userNum = db_getUsrNum(userName,roPwd)
   unscoredWeeks = db_getEventScheduleWeeks(eventNum,userNum,roPwd)
-  apiLog.info("get_eventUnscoredWeeksForUser - generating HTML")
+  eventFuncLog.info("get_eventUnscoredWeeksForUser - generating HTML")
   for row in range(len(unscoredWeeks)):
     htmlStr = htmlStr + "<option value='" + str(unscoredWeeks[row][0]) + "'>Week " + str(unscoredWeeks[row][0]) + "</option>"
   return htmlStr
@@ -182,10 +183,10 @@ def set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,token,altPwd):
       result/boolean - function success
       message/string - function result message
   """
-  apiLog.info("set_iCompUserAsEventParticipant - checking auth token")
+  eventFuncLog.info("set_iCompUserAsEventParticipant - checking auth token")
   if not validateToken(token):
-    apiLog.info("set_iCompUserAsEventParticipant - invalid or expired token")
-    apiLog.warning("set_iCompUserAsEventParticipant - someone tried to register " + userName + " to an event with an invalid token")
+    eventFuncLog.info("set_iCompUserAsEventParticipant - invalid or expired token")
+    eventFuncLog.warning("set_iCompUserAsEventParticipant - someone tried to register " + userName + " to an event with an invalid token")
     return {
              'result'  : False,
              'message' : 'invalid auth token'
@@ -193,14 +194,14 @@ def set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,token,altPwd):
   else:
     try:
       db_regForEvent(eventNum,userName,userNum,car,altPwd)
-      apiLog.info("set_iCompUserAsEventParticipant - " + userName + " registered for event #" + str(eventNum))
+      eventFuncLog.info("set_iCompUserAsEventParticipant - " + userName + " registered for event #" + str(eventNum))
       return {
                 'result'  : True,
                 'message' : 'event register was successful'
              }
     except Exception as e:
-      apiLog.error("set_iCompUserAsEventParticipant - exception occured during event registration")
-      apiLog.error(str(e))
+      eventFuncLog.error("set_iCompUserAsEventParticipant - exception occured during event registration")
+      eventFuncLog.error(str(e))
       return {
                 'result'  : False,
                 'message' : 'ERROR - ' + str(e)
@@ -224,22 +225,22 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
       result/boolean     - function success
       message/string     - function success message
   """
-  apiLog.info("set_scoreForUserInEventWeek - checking auth token")
+  eventFuncLog.info("set_scoreForUserInEventWeek - checking auth token")
   if not validateToken(token):
-    apiLog.info("set_scoreForUserInEventWeek - invalid or expired token")
-    apiLog.warning("set_scoreForUserInEventWeek - someone log score for " + userName + " to an event with an invalid token")
+    eventFuncLog.info("set_scoreForUserInEventWeek - invalid or expired token")
+    eventFuncLog.warning("set_scoreForUserInEventWeek - someone log score for " + userNum + " to an event with an invalid token")
     return {
              'result'  : False,
              'message' : 'invalid auth'
            } 
   else:
-    apiLog.info("set_scoreForUserInEventWeek - attempting to log score for " + userName)
-    apiLog.info("event: "     + str(eventNum))
-    apiLog.info("week: "      + str(weekNum))
-    apiLog.info("fin pos: "   + str(position))
-    apiLog.info("points: "    + str(points))
-    apiLog.info("inc count: " + str(incidents))
-    apiLog.info("fast lap: "  + str(fastLapTime))
+    eventFuncLog.info("set_scoreForUserInEventWeek - attempting to log score for " + userNum)
+    eventFuncLog.info("event: "     + str(eventNum))
+    eventFuncLog.info("week: "      + str(weekNum))
+    eventFuncLog.info("fin pos: "   + str(position))
+    eventFuncLog.info("points: "    + str(points))
+    eventFuncLog.info("inc count: " + str(incidents))
+    eventFuncLog.info("fast lap: "  + str(fastLapTime))
     try:
       if len(fastLapTime.split('.')) == 2:
         fastLapTime = "0." + fastLapTime
@@ -249,8 +250,8 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
                'message' : 'Week result logged successfully'
              }
     except Exception as e:
-      apiLog.error("set_scoreForUserInEventWeek - an exception occured while attempting to log a week score")
-      apiLog.error("set_scoreForUserInEventWeek - ERROR: " + str(e))
+      eventFuncLog.error("set_scoreForUserInEventWeek - an exception occured while attempting to log a week score")
+      eventFuncLog.error("set_scoreForUserInEventWeek - ERROR: " + str(e))
       return {
                'result'  : False,
                'message' : 'ERROR: ' + str(e)
@@ -272,29 +273,29 @@ def get_eventDetailInformation(userNum,eventNum,currentUserNum,fastLapBonus,roPw
     eventSeries         - iRacing series event covers
   """
   ##Get base event info
-  apiLog.info("get_eventDetailInformation - getting base event info")
+  eventFuncLog.info("get_eventDetailInformation - getting base event info")
   eventBaseInfo = db_getEventBaseInfo(eventNum,roPwd)
   ##Get and present single user schedule info
-  apiLog.info("get_eventDetailInformation - getting weekly results")
+  eventFuncLog.info("get_eventDetailInformation - getting weekly results")
   scheduleResults = db_pullScheduleResults(eventNum,userNum,roPwd)  
   ##Get base ranking information
-  apiLog.info("get_eventDetailInformation - base ranking information")
+  eventFuncLog.info("get_eventDetailInformation - base ranking information")
   rankingResults = db_pullEventUserRank(eventNum,roPwd)      
   ##Pull fast time results here and return list as username,week,fastlap ordered by week
-  apiLog.info("get_eventDetailInformation - getting lap times")
+  eventFuncLog.info("get_eventDetailInformation - getting lap times")
   eventFastLabTimes = db_pullEventFastLaps(eventNum,roPwd)  
   ##Set FLB enabled/disabled
   fastLapEnabled = False
   if str(eventBaseInfo[2]) == "1":
-    apiLog.info("get_eventDetailInformation - FLB Enabled")
+    eventFuncLog.info("get_eventDetailInformation - FLB Enabled")
     fastLapEnabled = True
   
   ##Generate schedule HTML
-  apiLog.info("get_eventDetailInformation - generating schedule html")
+  eventFuncLog.info("get_eventDetailInformation - generating schedule html")
   scheduleHtml     = _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,currentUserNum,eventNum,fastLapEnabled)
-  apiLog.info("get_eventDetailInformation - generating ranking html")
+  eventFuncLog.info("get_eventDetailInformation - generating ranking html")
   rankingHtml      = _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,fastLapBonus,fastLapEnabled,roPwd)
-  apiLog.info("get_eventDetailInformation - generating driverSelect html")
+  eventFuncLog.info("get_eventDetailInformation - generating driverSelect html")
   driverSelectHtml = _generate_eventDetailParticipantDropdownHtml(eventNum,userNum,roPwd)
   eventName        = eventBaseInfo[0]
   eventSeries      = eventBaseInfo[1]
@@ -318,15 +319,19 @@ def update_eventDetailsDisplayTable(userName,runningOrFinished,token,roPwd):
   OUTPUT
     tableHtml/string      - html to update table with
   """  
-  getEvents = ""
-  apiLog.info("update_eventDetailsDisplayTable - validating auth token")
-  if not runningOrFinished(token):    
-    apiLog.warning("update_eventDetailsDisplayTable - invalid token used to pull event details for " + userName)
+  getEvents   = ""
+  htmlStrBase = ""
+  htmlStr     = ""
+  eventFuncLog.info("update_eventDetailsDisplayTable - validating auth token")
+  if not validateToken(token):    
+    eventFuncLog.warning("update_eventDetailsDisplayTable - invalid token used to pull event details for " + userName)
+    return "invalid or expired token"
+  else:
     if runningOrFinished == "act":
-      apiLog.info("update_eventDetailsDisplayTable - Pulling event list for " + userName)
+      eventFuncLog.info("update_eventDetailsDisplayTable - Pulling event list for " + userName)
       getEvents = db_getRegisteredEvents(userName,0,roPwd)
     elif runningOrFinished == "fin":
-      apiLog.info("update_eventDetailsDisplayTable - Pulling event list for " + userName)
+      eventFuncLog.info("update_eventDetailsDisplayTable - Pulling event list for " + userName)
       getEvents = db_getRegisteredEvents(userName,1,roPwd)
       
     htmlStrBase = '''
