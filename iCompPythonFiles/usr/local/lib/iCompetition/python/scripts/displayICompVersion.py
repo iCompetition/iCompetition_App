@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+##displays version information to console.  provides app version and pulls version for db schema
+
 import sys 
 sys.path.append("/usr/local/lib/iCompetition/python")
 sys.path.append("/usr/local/lib/iCompetition/python/crypt")
