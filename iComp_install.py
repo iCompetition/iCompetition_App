@@ -5,6 +5,7 @@
 
 ##Imports
 import os
+import os.path
 import sys
 import subprocess
 import getpass
@@ -253,6 +254,17 @@ def addAdditionalConfig():
     fh.close()
 
 
+def changeLoginPageImage():
+    confirmChange = input("Do you want to replace the login page logo image? (y/n):  ")
+    if confirmChange.upper() == "Y":
+        fileLocation = input("Enter the path for the replacement image:  ")
+        if os.path.exists(fileLocation):
+            os.popen('python3 /usr/local/lib/iCompetition/scripts/changeLoginPageImage.py ' + fileLocation)
+        else:
+            sys.stdout.write("\nThe provided filed does not exists.\n")
+            sys.stdout.write("You can change the image later by running iCompWeb-changeLoginImage\n\n")
+
+
 def main():
     CheckPrereq()
     makeiCompDirs()
@@ -262,6 +274,7 @@ def main():
     getDbInfo()
     getEmailConf()
     addAdditionalConfig()
+    changeLoginPageImage()
     sys.stdout.write('\n\n')
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')

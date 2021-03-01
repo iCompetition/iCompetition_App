@@ -12,4 +12,6 @@ alias iCompGo-install='cd /usr/local/lib/iCompetition'
 alias iCompGo-config='cd /etc/iCompetition'
 alias iCompGo-web='cd /var/www/iCompetition/'
 alias iCompGo-log='cd /var/log/iComp/'
+#Web Commands
+alias iCompWeb-changeLoginImage="python3 /usr/local/lib/iCompetition/python/scripts/changeLoginPageImage.py"
 
