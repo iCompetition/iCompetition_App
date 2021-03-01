@@ -129,6 +129,14 @@ def CheckPrereq():
         sys.stdout.write('FALSE\n\n')
         sys.stdout.write("iComp Requires simplecrypt to be installed\n\n")
         sys.exit   
+    try:
+        sys.stdout.write('Python3 module - pymysql installed...')
+        import pymysql
+        sys.stdout.write('TRUE\n')
+    except ModuleNotFoundError:
+        sys.stdout.write('FALSE\n\n')
+        sys.stdout.write("iComp Requires pymysql to be installed\n\n")
+        sys.exit   
 
 
 def makeiCompDirs():
