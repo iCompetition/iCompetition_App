@@ -470,8 +470,8 @@ def db_addChangeReqToDB(event,user,week,pnt,pos,inc,cPnt,cPos,cInc,fl,ofl,rights
                         """ + str(pos)      + """,
                         """ + str(event)    + """,
                         """ + str(week)     + """,
-                        """ + str(fl)       + """,
-                        """ + str(ofl)      + """);
+                        '""" + str(ofl)       + """',
+                        '""" + str(fl)      + """');
   """  
   cr.execute(insertQuery)
   cr.execute("update scoring set changeRequested = 1 where eventNum = " + str(event) + " and userNum = " + str(user) + " and week = " + str(week) + ";")
@@ -494,7 +494,7 @@ def db_getChgReqList(rights):
                  eventNum,
                  week,
                  curFastLap,
-                 oldFastLap                 
+                 newFastLap                 
           from requestedChanges
           order by reqNum
           """
@@ -528,7 +528,7 @@ def db_approveChgReq(reqNum, rights):
          set points = """    + str(chgResults[0][3]) + """,
              position = """  + str(chgResults[0][4]) + """,
              inc = """       + str(chgResults[0][5]) + """,
-             fastLap = """   + str(chgResults[0][6]) + """,
+             fastLap = '"""   + str(chgResults[0][6]) + """',
              changeRequested = 0
          where userNum = """ + str(chgResults[0][0]) + """
          and eventNum = """  + str(chgResults[0][1]) + """

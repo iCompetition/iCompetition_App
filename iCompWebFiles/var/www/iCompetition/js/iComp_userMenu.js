@@ -235,6 +235,7 @@ function startScoreModify(eventNum,userNum,week){
   ms_curPos     = document.getElementById("ms_curPos");
   ms_curPnt     = document.getElementById("ms_curPnt");
   ms_curinc     = document.getElementById("ms_curinc");
+  ms_curlap     = document.getElementById("ms_curlap");
   ms_newPos     = document.getElementById("ms_position");
   ms_newPnt     = document.getElementById("ms_points");
   ms_newinc     = document.getElementById("ms_inc");
