@@ -181,8 +181,8 @@ function reviewChgReqs(){
   if (response.cnt == 0){
     displayAlertDimissableInfo("No Requests");
   }else{
-    document.getElementById("simpleListTable").innerHTML = response.html;
-    showModal("simpleListModal");
+    document.getElementById("requestApprovalTabel").innerHTML = response.html;
+    showModal("requestApprovalModal");
   }
 }
 
@@ -204,6 +204,7 @@ function actOnChangeChg(reqNum,appDeny){
   }else{
     displayAlertDimissableInfo("Action Failed");
    }
+   hideModal("requestApprovalModal")
 }
 
 

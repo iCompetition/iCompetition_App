@@ -83,7 +83,7 @@ def get_changeRequests(roPwd):
       htmlStr = htmlStr + '<td>' + str(chgList[i][3]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][6]) + "</td>\n"
       htmlStr = htmlStr + '<td>' + str(chgList[i][4]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][7]) + "</td>\n"
       htmlStr = htmlStr + '<td>' + str(chgList[i][5]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][8]) + "</td>\n"
-      htmlStr = htmlStr + '<td><i class="far fa-check-square mr-2" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',true)"; ></i> <i class="far fa-times-circle mr-2" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',false)"; ></i></td>\n'
+      htmlStr = htmlStr + '<td><i class="far fa-check-square mr-2" data-toggle="tooltop" data-placement="top" title="Approve Change" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',true)" ; ></i> <i class="far fa-times-circle mr-2" data-toggle="tooltop" data-placement="top" title="Approve Change" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',false)"; ></i></td>\n'
       htmlStr = htmlStr + '</tr>\n'  
     return {
             'changeCnt' : len(chgList),
