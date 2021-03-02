@@ -238,6 +238,7 @@ function startScoreModify(eventNum,userNum,week){
   ms_newPos     = document.getElementById("ms_position");
   ms_newPnt     = document.getElementById("ms_points");
   ms_newinc     = document.getElementById("ms_inc");
+  ms_newlap     = document.getElementById("ms_lap");
   
   const call = new XMLHttpRequest(),
   url = apiAddress + "iComp/event/modify/getResultsPreModify?token=" + getCookie("auth") + "&eventNum=" + eventNum + "&userNum=" + userNum + "&week=" + week;
@@ -251,9 +252,11 @@ function startScoreModify(eventNum,userNum,week){
     ms_curPos.innerHTML     = response.position
     ms_curPnt.innerHTML     = response.points
     ms_curinc.innerHTML     = response.inc
+    ms_curlap.innerHTML     = response.lap
     ms_newPos.disabled      = false;
     ms_newPnt.disabled      = false;
     ms_newinc.disabled      = false;
+    ms_newlap.disabled      = false;
     setCookie('tmp_reqChg_eventNum',eventNum,100);
     setCookie('tmp_reqChg_userNum',userNum,100);
     setCookie('tmp_reqChg_wkNum',week,100);
@@ -273,12 +276,13 @@ function reqScoreChange(){
   newPnt   = ms_newPnt.value;
   newPos   = ms_newPos.value;
   newInc   = ms_newinc.value;
+  newLap   = ms_newlap.value;
   eventNum = getCookie('tmp_reqChg_eventNum');
   userNum  = getCookie('tmp_reqChg_userNum');
   weekNum  = getCookie('tmp_reqChg_wkNum');
   
   const call = new XMLHttpRequest(),
-  url = apiAddress + "iComp/event/modify/reqChange?token=" + getCookie("auth") + "&eventNum=" + eventNum + "&userNum=" + userNum + "&week=" + weekNum + "&pnt=" + newPnt+ "&pos=" + newPos+ "&inc=" + newInc;
+  url = apiAddress + "iComp/event/modify/reqChange?token=" + getCookie("auth") + "&eventNum=" + eventNum + "&userNum=" + userNum + "&week=" + weekNum + "&pnt=" + newPnt+ "&pos=" + newPos + "&inc=" + newInc + "&lap=" + newLap;
   call.open("GET",url,false);
   call.send(null);
   response = JSON.parse(call.responseText);    
@@ -292,9 +296,14 @@ function reqScoreChange(){
   deleteCookie('tmp_reqChg_eventNum');
   deleteCookie('tmp_reqChg_userNum');
   deleteCookie('tmp_reqChg_wkNum');
-  ms_newPos.value = '';
-  ms_newPnt.value = '';
-  ms_newinc.value = '';
+  ms_newPos.value    = '';
+  ms_newPnt.value    = '';
+  ms_newinc.value    = '';
+  ms_newlap.value    = '';
+  ms_newPos.disabled = true;
+  ms_newPnt.disabled = true;
+  ms_newinc.disabled = true;
+  ms_newlap.disabled = true;  
 }
 
 
