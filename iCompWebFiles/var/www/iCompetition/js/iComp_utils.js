@@ -77,3 +77,35 @@ function iCompServerCheck(){
     call.send(null);
      
 }
+
+function randomFactoid(){
+  phrase     = [
+                "Kidney stones are tough to pass",
+                "Powwwaaaa",
+                "\"Speed has never killed anyone...suddenly becoming stationary,  that's what gets you\" -- Jeremy Clarkson",
+                "\"The oval community is better than the road racing community\" -- Everybody ",
+                "Just keep turning left",
+                "BRAKES!",
+                "To finish first, you must first finish",
+                "DANGER TO MANIFOLD!",
+                "NOOSSSSS",
+                "Straight roads are for fast cars, turns are for fast drivers",
+                "\"Racing makes heroin addiction look like a vague wish for something salty.\" -- Peter Egan",
+                "Leiws Hamiltion is overrated....What?...Wanna fight about it!?",
+                "\"The winner ain't the one with the fastest car, it's the one who refuses to lose.\" -- Dale Earnhardt",
+                "\"Aerodynamics are for people who can't build engines\" -- Enzo Ferrari",
+                "Enzo Ferrari was kind of a cry baby.  Donut did a podcast on it...check it out",
+                "R.I.P Paul",
+                "Saw a really old lady in a modded GTI the other day.  That was cool",
+                "LOL - Miata",
+                "\"I drive a cool civic\" is never a true statement",
+                "Mitsubishi should bring back the eclipse....properly",
+                "\"It's not a throttle-it's a detonator.\" -- Jeremy Clarkson",
+                "Better luck next week",
+                "iRace, iCrash, iCry",
+                "Thank you for using iCompetition.  We know you don't have other choices and we welcome you to mediocrity",
+                "Michael > LeBron"
+                ]
+  pullIndex  = Math.floor(Math.random() * phrase.length);
+  document.getElementById("randomText").innerHTML = phrase[pullIndex];
+}

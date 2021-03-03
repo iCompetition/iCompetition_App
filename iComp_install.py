@@ -40,11 +40,11 @@ def CheckPrereq():
         sys.exit()
 
     #Check python version
-    sys.stdout.write("\nChecking iComp prereqs...\n\n")
+    sys.stdout.write("\nChecking iComp prereqs...\n")
     sys.stdout.write("Python version meets requirements...")
     if sys.version_info[0] < 3:
-        sys.stdout.write("FALSE\n\n")
-        sys.stdout.write("iComp Requires Version 3 or higher\n\n")
+        sys.stdout.write("FALSE\n")
+        sys.stdout.write("iComp Requires Version 3 or higher\n")
         sys.exit()
     else:
         sys.stdout.write("TRUE\n")
@@ -58,8 +58,8 @@ def CheckPrereq():
         sys.stdout.write("TRUE\n")
         pass        
     else:
-        sys.stdout.write("FALSE\n\n")
-        sys.stdout.write("iComp Requires apache2 to be installed\n\n")
+        sys.stdout.write("FALSE\n")
+        sys.stdout.write("iComp Requires apache2 to be installed\n")
         sys.exit()        
     #gunicorn
     sys.stdout.write("Gunicorn is installed...")
@@ -68,8 +68,8 @@ def CheckPrereq():
         sys.stdout.write("TRUE\n")
         pass        
     else:
-        sys.stdout.write("FALSE\n\n")
-        sys.stdout.write("iComp Requires gunicorn to be installed\n\n")
+        sys.stdout.write("FALSE\n")
+        sys.stdout.write("iComp Requires gunicorn to be installed\n")
         sys.exit()        
 
     ##Check python modules
@@ -78,69 +78,69 @@ def CheckPrereq():
         import flask
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires flask to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires flask to be installed\n")
         sys.exit
     try:
         sys.stdout.write('Python3 module - flask_cors installed...')
         import flask_cors
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires flask_cors to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires flask_cors to be installed\n")
         sys.exit        
     try:
         sys.stdout.write('Python3 module - smtplib installed...')
         import smtplib
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires smtplib to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires smtplib to be installed\n")
         sys.exit        
     try:
         sys.stdout.write('Python3 module - hashlib installed...')
         import hashlib
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires hashlib to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires hashlib to be installed\n")
         sys.exit            
     try:
         sys.stdout.write('Python3 module - email.mime.multipart installed...')
         import email.mime.multipart
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires email.mime.multipart to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires email.mime.multipart to be installed\n")
         sys.exit      
     try:
         sys.stdout.write('Python3 module - email.mime.text installed...')
         import email.mime.text
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires eemail.mime.text to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires eemail.mime.text to be installed\n")
         sys.exit      
     try:
         sys.stdout.write('Python3 module - simplecrypt installed...')
         import simplecrypt
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires simplecrypt to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires simplecrypt to be installed\n")
         sys.exit   
     try:
         sys.stdout.write('Python3 module - pymysql installed...')
         import pymysql
         sys.stdout.write('TRUE\n')
     except ModuleNotFoundError:
-        sys.stdout.write('FALSE\n\n')
-        sys.stdout.write("iComp Requires pymysql to be installed\n\n")
+        sys.stdout.write('FALSE\n')
+        sys.stdout.write("iComp Requires pymysql to be installed\n")
         sys.exit   
 
 
 def makeiCompDirs():
-    sys.stdout.write('\n\nMaking local dirs\n\n')
+    sys.stdout.write('\nMaking local dirs\n')
     for i in range(len(dirsToCreate)):
       try:
           sys.stdout.write("creating " + dirsToCreate[i] + "\n")
@@ -152,7 +152,7 @@ def makeiCompDirs():
 
 
 def buildApacheConf():
-    sys.stdout.write("\n\nHTTPS Info\n\n")
+    sys.stdout.write("\nHTTPS Info\n")
     httpsOn = ""
     certLoc = ""
     keyLoc  = ""
@@ -194,7 +194,7 @@ def buildJSSharedVars():
     fh.close()
 
 def copyFiles():
-    sys.stdout.write('\n\nCopying files to system\n\n')
+    sys.stdout.write('\nCopying files to system\n')
     os.popen('cp ./iCompPythonFiles/usr/local/lib/iCompetition/api/* /usr/local/lib/iCompetition/api/')
     os.popen('cp -r ./iCompPythonFiles/usr/local/lib/iCompetition/python/* /usr/local/lib/iCompetition/python/')
     os.popen('cp -r ./iCompWebFiles/var/www/iCompetition/* /var/www/iCompetition/')
@@ -212,7 +212,7 @@ def getDbInfo():
     sys.path.append("/usr/local/lib/iCompetition/python")
     from iComp_util import iencrypt
     
-    sys.stdout.write("\n\nDatabase Info\n\n")
+    sys.stdout.write("\nDatabase Info\n")
     dblocation = input("DB Url or IP Addres:      ")
     dbport     = input("DB Port:                  ")
     dbname     = input("DB Name:                  ")
@@ -270,7 +270,9 @@ def changeLoginPageImage():
             os.popen('python3 /usr/local/lib/iCompetition/scripts/changeLoginPageImage.py ' + fileLocation)
         else:
             sys.stdout.write("\nThe provided filed does not exists.\n")
-            sys.stdout.write("You can change the image later by running iCompWeb-changeLoginImage\n\n")
+            sys.stdout.write("You can change the image later by running iCompWeb-changeLoginImage\n")
+    else:
+        sys.stdout.write("You can change the image later by running iCompWeb-changeLoginImage\n")
 
 
 def main():
