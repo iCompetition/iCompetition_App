@@ -131,11 +131,13 @@ function enableScoreInputs(){
   
   if (wkSelChoice != "Select Week..."){
     document.getElementById("score_position").disabled = false;
+    document.getElementById("score_qualify").disabled = false;
     document.getElementById("score_points").disabled = false;
     document.getElementById("score_inc").disabled = false;
     document.getElementById("score_lap").disabled = false;
   }else{
     document.getElementById("score_position").disabled = true;
+    document.getElementById("score_qualify").disabled = true;
     document.getElementById("score_points").disabled = true;
     document.getElementById("score_inc").disabled = true;
     document.getElementById("score_lap").disabled = true;
@@ -146,16 +148,17 @@ function logScore(){
   eSel = document.getElementById("score_eventSel");
   wSel = document.getElementById("score_weekSel");
   
-  en  = eSel.options[eSel.selectedIndex].value;
-  wn  = wSel.options[wSel.selectedIndex].value;
-  pos = document.getElementById("score_position").value;
-  pnt = document.getElementById("score_points").value;
-  inc = document.getElementById("score_inc").value;
-  lap = document.getElementById("score_lap").value;
-  un  = getCookie("userNum");
+  en   = eSel.options[eSel.selectedIndex].value;
+  wn   = wSel.options[wSel.selectedIndex].value;
+  pos  = document.getElementById("score_position").value;
+  qual = document.getElementById("score_qualify").value;
+  pnt  = document.getElementById("score_points").value;
+  inc  = document.getElementById("score_inc").value;
+  lap  = document.getElementById("score_lap").value;
+  un   = getCookie("userNum");
   
   const call = new XMLHttpRequest(),
-  url = apiAddress + "iComp/events/logScore?userNum=" + un + "&eventNum=" + en + "&wkNum=" + wn + "&pos=" + pos + "&pnt=" + pnt + "&inc=" + inc + "&lap=" + lap + "&token=" + getCookie("auth");
+  url = apiAddress + "iComp/events/logScore?userNum=" + un + "&eventNum=" + en + "&wkNum=" + wn + "&pos=" + pos + "&pnt=" + pnt + "&inc=" + inc + "&lap=" + lap + "&qual=" + qual + "&token=" + getCookie("auth");
   call.open("GET",url,false);
   call.send(null);
   response = JSON.parse(call.responseText);

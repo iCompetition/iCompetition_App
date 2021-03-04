@@ -241,10 +241,10 @@ def db_getEventScheduleWeeks(eventNum,userNum,rights):
   return results  
 
 
-def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,rights):
+def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,qual,diff,rights):
   db = _dbConnect("write",rights)
   cr = db.cursor()   
-  cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0,'" + lap + "');")
+  cr.execute("insert into scoring values (" + eventNum + "," + wkNum + "," + userName + "," + pnt + "," + inc + "," + pos + ",0,'" + lap + "'," + qual + "," + diff + ");")
   cr.execute("insert into topLap values(" + eventNum + "," + wkNum + "," + userName + ",'" + lap + "');")
   _dbClose(db,cr)
   return True

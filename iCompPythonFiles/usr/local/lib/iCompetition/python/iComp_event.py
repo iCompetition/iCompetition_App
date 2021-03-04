@@ -208,7 +208,7 @@ def set_iCompUserAsEventParticipant(eventNum,userName,userNum,car,token,altPwd):
              }    
 
 
-def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,incidents,fastLapTime,token,altPwd):
+def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,incidents,startPos,fastLapTime,token,altPwd):
   """
   Log a user score for an event week
   INPUTS
@@ -218,6 +218,7 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
     position/int        - finish position for week
     points/int          - points earned for week
     incidents/int       - incidents for week
+    startPos/int        - started/qualified position
     fastLapTime/string  - fastest lap for the week (x.xx.xx)
     token/string        - auth token
   OUTPUT
@@ -226,6 +227,14 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
       message/string     - function success message
   """
   eventFuncLog.info("set_scoreForUserInEventWeek - checking auth token")
+
+  ##Determine posGained
+  posDiff = int(startPos) - int(position)
+  if posDiff < 0:
+    posDiff = 0
+  else:
+    pass
+
   if not validateToken(token):
     eventFuncLog.info("set_scoreForUserInEventWeek - invalid or expired token")
     eventFuncLog.warning("set_scoreForUserInEventWeek - someone log score for " + userNum + " to an event with an invalid token")
@@ -244,7 +253,7 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
     try:
       if len(fastLapTime.split('.')) == 2:
         fastLapTime = "0." + fastLapTime
-      logScore = db_logScore(userNum,eventNum,weekNum,position,points,incidents,fastLapTime,altPwd)
+      logScore = db_logScore(userNum,eventNum,weekNum,position,points,incidents,fastLapTime,startPos,str(posDiff),altPwd)
       return {
                'result'  : True,
                'message' : 'Week result logged successfully'

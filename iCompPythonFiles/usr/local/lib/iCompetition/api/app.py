@@ -455,8 +455,9 @@ def logScoreForWeek():
   pnt      = parser['pnt']
   inc      = parser['inc']
   lap      = parser['lap']
+  qual     = parser['qual']
   t        = parser['token']
-  logScore = set_scoreForUserInEventWeek(un,en,wn,pos,pnt,inc,lap,t,altPwd)
+  logScore = set_scoreForUserInEventWeek(un,en,wn,pos,pnt,inc,qual,lap,t,altPwd)
   return json.dumps(
                      {
                        'result' : logScore['result'],
