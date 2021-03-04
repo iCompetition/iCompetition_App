@@ -253,7 +253,7 @@ def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,qual,diff,rights):
 def db_getEventBaseInfo(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select name, series, enableFastLapBonus from event where eventNum = " + str(eventNum) + ";")
+  cr.execute("select name, series, enableFastLapBonus, enabledHardChargerBonus from event where eventNum = " + str(eventNum) + ";")
   results = cr.fetchone()
   _dbClose(db,cr)
   return results
@@ -267,11 +267,27 @@ def db_pullEventFastLaps(eventNum,rights):
   _dbClose(db,cr)
   return results  
 
+def db_pullEventTopPosDif(eventNum,rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor()  
+  cr.execute("select week, max(posGain) from scoring where eventNum = " + str(eventNum) + " group by week order by week;")
+  results = cr.fetchall()
+  _dbClose(db,cr)
+  return results  
 
 def db_pullEventFastLapsForUser(eventNum,userNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
   cr.execute("select weekNum, min(laptime) from topLap where eventNum = " + str(eventNum) + " and userNum = " + str(userNum) + " group by weekNum order by weekNum;")
+  results = cr.fetchall()
+  _dbClose(db,cr)
+  return results  
+
+
+def db_pullEventTopPosDifForUser(eventNum,userNum,rights):
+  db = _dbConnect("read",rights)
+  cr = db.cursor()  
+  cr.execute("select week, min(posGain) from scoring where eventNum = " + str(eventNum) + " and userNum = " + str(userNum) + " group by week order by week;")
   results = cr.fetchall()
   _dbClose(db,cr)
   return results  
@@ -288,7 +304,7 @@ def db_getEventParticipants(eventNum,rights):
 
 def db_pullEventUserRank(eventNum,rights):
   userRankQuery = """
-    select p.userNum, u.firstName, u.lastName, p.vehicle, sc.points, u.userName, sc.fastLap
+    select p.userNum, u.firstName, u.lastName, p.vehicle, sc.points, u.userName, sc.fastLap, sc.posGain
     from participants p
     join scoring sc on p.userNum = sc.userNum
     join users u on sc.userNum = u.userNum
@@ -310,7 +326,7 @@ def db_pullEventUserRank(eventNum,rights):
 
 def db_pullScheduleResults(eventNum,userNum,rights):
   scheduleQuery = """
-    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested, sc.fastLap
+    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested, sc.fastLap, sc.qualPosition, sc.posGainposGain
       from schedule sch 
         left join scoring sc 
           on sch.week = sc.week
@@ -354,7 +370,7 @@ def db_listEvents_active(rights):
   return results  
 
 
-def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus):
+def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus,hardChargerBonus):
   eNum = 0
   carList = cars.split(",")
   db = _dbConnect("write",rights)
@@ -365,7 +381,7 @@ def db_createEvent(eName,eSeries,wkTracks,w13,cars,live,rights,fastLapBonus):
     eventNum = 1
   else:
     eventNum = (result[0][0] + 1)  
-  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + "," + str(fastLapBonus) + ",0,'');")
+  cr.execute("insert into event values('" + eName + "','" + eSeries + "'," + str(eventNum) + "," + str(live) + "," + str(fastLapBonus) + ",0,''," + str(hardChargerBonus) + ");")
   cr.execute("insert into schedule values (" + str(eventNum) + ",1,'"  + wkTracks['1'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",2,'"  + wkTracks['2'] + "');")
   cr.execute("insert into schedule values (" + str(eventNum) + ",3,'"  + wkTracks['3'] + "');")

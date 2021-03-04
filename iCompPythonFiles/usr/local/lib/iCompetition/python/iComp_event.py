@@ -266,7 +266,7 @@ def set_scoreForUserInEventWeek(userNum,eventNum,weekNum,position,points,inciden
                'message' : 'ERROR: ' + str(e)
              }
 
-def get_eventDetailInformation(userNum,eventNum,currentUserNum,fastLapBonus,roPwd):
+def get_eventDetailInformation(userNum,eventNum,currentUserNum,fastLapBonus,hardChargBonus,roPwd):
   """
   Get the scoring information for an event
   INPUT
@@ -292,18 +292,23 @@ def get_eventDetailInformation(userNum,eventNum,currentUserNum,fastLapBonus,roPw
   rankingResults = db_pullEventUserRank(eventNum,roPwd)      
   ##Pull fast time results here and return list as username,week,fastlap ordered by week
   eventFuncLog.info("get_eventDetailInformation - getting lap times")
-  eventFastLabTimes = db_pullEventFastLaps(eventNum,roPwd)  
+  eventFastLabTimes = db_pullEventFastLaps(eventNum,roPwd)
+  eventTopPosDif    = db_pullEventTopPosDif(eventNum,roPwd)  
   ##Set FLB enabled/disabled
-  fastLapEnabled = False
+  fastLapEnabled   = False
+  hardChargEnabled = False
   if str(eventBaseInfo[2]) == "1":
     eventFuncLog.info("get_eventDetailInformation - FLB Enabled")
     fastLapEnabled = True
+  if str(eventBaseInfo[3]) == "1":
+    eventFuncLog.info("get_eventDetailInformation - HCB Enabled")
+    hardChargEnabled = True    
   
   ##Generate schedule HTML
   eventFuncLog.info("get_eventDetailInformation - generating schedule html")
-  scheduleHtml     = _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,currentUserNum,eventNum,fastLapEnabled)
+  scheduleHtml     = _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTopPosDif,userNum,currentUserNum,eventNum,fastLapEnabled,hardChargEnabled)
   eventFuncLog.info("get_eventDetailInformation - generating ranking html")
-  rankingHtml      = _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,fastLapBonus,fastLapEnabled,roPwd)
+  rankingHtml      = _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventTopPosDif,eventNum,fastLapBonus,hardChargBonus,fastLapEnabled,hardChargEnabled,roPwd)
   eventFuncLog.info("get_eventDetailInformation - generating driverSelect html")
   driverSelectHtml = _generate_eventDetailParticipantDropdownHtml(eventNum,userNum,roPwd)
   eventName        = eventBaseInfo[0]
@@ -392,7 +397,7 @@ def _generate_eventDetailParticipantDropdownHtml(eventNum,userNum,roPwd):
 
   return userSelDropDownHtml
 
-def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,fastLapBonus,fastLapEnabled,roPwd):
+def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventTopPosDif,eventNum,fastLapBonus,hardChargBonus,fastLapEnabled,hardChargEnabled,roPwd):
   """
   Sort out and generate html for event ranking information
   INPUT
@@ -420,6 +425,7 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,f
     userLast   = rankingResults[row][2]
     userCar    = rankingResults[row][3]
     fastLap    = rankingResults[row][6]
+    posGained  = rankingResults[row][7]
     if userNum not in reviewed:
       reviewed.append(userNum)
       for row2 in range(len(rankingResults)):
@@ -439,20 +445,34 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,f
       else:
         pass
 
-      if fastLapEnabled:
+      if fastLapEnabled or hardChargEnabled:
         bonus = 0
-        userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
-        for i in range(len(eventFastLabTimes)):
-          for j in range(len(userFL)):
-            try:
-              if eventFastLabTimes[i][1] == userFL[i][1]:
-                if i < 9:
-                  bonus = bonus + fastLapBonus
-                  break
-                else:
-                  pass
-            except IndexError:
-              pass
+        if fastLapEnabled:
+          userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
+          for i in range(len(eventFastLabTimes)):
+            for j in range(len(userFL)):
+              try:
+                if eventFastLabTimes[i][1] == userFL[i][1]:
+                  if i < 9:
+                    bonus = bonus + fastLapBonus
+                    break
+                  else:
+                    pass
+              except IndexError:
+                pass
+        if hardChargEnabled:
+          userHC = db_pullEventTopPosDifForUser(eventNum,userNum,roPwd)
+          for i in range(len(eventTopPosDif)):
+            for j in range(len(userHC)):
+              try:
+                if eventFastLabTimes[i][1] == userHC[i][1]:
+                  if i < 9:
+                    bonus = bonus + hardChargBonus
+                    break
+                  else:
+                    pass
+              except IndexError:
+                pass              
       pointSum = sum(tmpPoints) + bonus
       rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
   rankingInfo.sort(reverse=True)
@@ -478,7 +498,7 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventNum,f
   return rankingHTML
 
 
-def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,curUserNum,eventNum,fastLapEnabled):
+def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTopPosDif,userNum,curUserNum,eventNum,fastLapEnabled,hardChargEnabled):
   """
   Sort out and generate html for event details schedule information
   INPUT
@@ -522,6 +542,8 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
     inc      = str(scheduleResults[row][4])
     chgReq   = str(scheduleResults[row][5])
     fastLap  = str(scheduleResults[row][6])
+    startPos = str(scheduleResults[row][7])
+    posGain  = str(scheduleResults[row][8])
     fastLap_reformed = fastLap
     ##check for null fastlap
     if fastLap == "" or fastLap == 0 or fastLap is None:
@@ -546,6 +568,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
         scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
       else:
         scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+      scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"  
       scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
       scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
@@ -554,8 +577,23 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
     else:
       ##HTML for counted week
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      if fastLapEnabled and row < len(eventFastLabTimes):
-        if fastLap == eventFastLabTimes[row][1]:
+      if (fastLapEnabled and row < len(eventFastLabTimes)) or (hardChargEnabled and row < len(eventTopPosDif)):
+        if fastLap == eventFastLabTimes[row][1] and posGain == eventTopPosDif[row][1]:
+          scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
+          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap and Hard Charge Bonuses Applied For This Week"><i class="fab fa-reddit-alien"></i></a>  ' + week + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and userNum.strip() == curUserNum.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and userNum.strip() == curUserNum.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"  
+        elif fastLap == eventFastLabTimes[row][1]:
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap Bonus Applied For This Week"><i class="fas fa-stopwatch"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -565,10 +603,26 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
             scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
           else:
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-          scheduleHtml = scheduleHtml + "</tr>"  
+          scheduleHtml = scheduleHtml + "</tr>"     
+        elif posGain == eventTopPosDif[row][1]:
+          scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
+          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and userNum.strip() == curUserNum.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and userNum.strip() == curUserNum.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"                    
         else:
           scheduleHtml = scheduleHtml + "<tr>"  
           scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
@@ -579,6 +633,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
             scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
           else:
             scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
@@ -593,6 +648,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,userNum,
           scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
         else:
           scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+        scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
         scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
         scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
         scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"

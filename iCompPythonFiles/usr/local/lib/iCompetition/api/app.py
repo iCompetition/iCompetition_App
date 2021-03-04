@@ -54,6 +54,7 @@ ensureTokenDirsExist()
 #2) CONFIG INFO PULL
 confDict = getConf()
 fl_bonus = int(confDict['fastLapBonusAmount'])
+hc_bonus = int(confDict['hardChargerBonusAmount'])
 
 #3) API HOST RUN  VARIABLES
 app = Flask(__name__)
@@ -472,7 +473,7 @@ def pullEventDetailInfo():
   un           = parser['userNum']
   en           = parser['eventNum']
   curUn        = parser['currentUserNum']
-  eventDetails = get_eventDetailInformation(un,en,curUn,fl_bonus,roPwd)
+  eventDetails = get_eventDetailInformation(un,en,curUn,fl_bonus,hc_bonus,roPwd)
   return json.dumps(
                      {
                        'schedule'     : eventDetails['scheduleHtml'], 
@@ -588,25 +589,26 @@ def adm_listEvents():
 @app.route('/iComp/admin/createEvent', methods=['POST'])
 def adm_createEvent():
   apiLog.info("ADMIN - CREATE EVENT EP")
-  auth         = request.form['auth']
-  evName       = request.form['en']
-  evSeries     = request.form['es']
-  wk1t         = request.form['w1']
-  wk2t         = request.form['w2']
-  wk3t         = request.form['w3']
-  wk4t         = request.form['w4']
-  wk5t         = request.form['w5']
-  wk6t         = request.form['w6']
-  wk7t         = request.form['w7']
-  wk8t         = request.form['w8']
-  wk9t         = request.form['w9']
-  wk10t        = request.form['w10']
-  wk11t        = request.form['w11']
-  wk12t        = request.form['w12']
-  wk13t        = request.form['w13']
-  cars         = request.form['cars']
-  live         = request.form['live']
-  fastLapBonus = request.form['fastLapBonus']
+  auth             = request.form['auth']
+  evName           = request.form['en']
+  evSeries         = request.form['es']
+  wk1t             = request.form['w1']
+  wk2t             = request.form['w2']
+  wk3t             = request.form['w3']
+  wk4t             = request.form['w4']
+  wk5t             = request.form['w5']
+  wk6t             = request.form['w6']
+  wk7t             = request.form['w7']
+  wk8t             = request.form['w8']
+  wk9t             = request.form['w9']
+  wk10t            = request.form['w10']
+  wk11t            = request.form['w11']
+  wk12t            = request.form['w12']
+  wk13t            = request.form['w13']
+  cars             = request.form['cars']
+  live             = request.form['live']
+  fastLapBonus     = request.form['fastLapBonus']
+  hardChargerBonus = request.form['hardChargerBonus']
   wkTracks = {
                '1'  : wk1t, 
                '2'  : wk2t, 
@@ -622,7 +624,7 @@ def adm_createEvent():
                '12' : wk12t, 
                '13' : wk13t
              }
-  createEvent = create_newICompEvent(evName,evSeries,wkTracks,cars,live,fastLapBonus,auth,altPwd)
+  createEvent = create_newICompEvent(evName,evSeries,wkTracks,cars,live,fastLapBonus,hardChargerBonus,auth,altPwd)
   return json.dumps(
                      {
                        'result'  : createEvent['result'],

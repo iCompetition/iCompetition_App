@@ -183,7 +183,7 @@ def get_activeICompEvents(token,roPwd):
            }    
 
 
-def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enabled,admToken,altPwd):
+def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enabled,HCB_enabled,admToken,altPwd):
   """
   add a new iComp event to database
   INPUT
@@ -193,6 +193,7 @@ def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enable
     cars/list          - cars available in series
     isLive/int         - set event live or disabled (0/1)
     FLB_enabled/int    - set FLB enabled (0/1)
+    HCB_enabled/int    - set HCB enabled (0/1)
     admToken/string    - auth token
   OUTPUT
     dictionary
@@ -210,7 +211,7 @@ def create_newICompEvent(eventName,eventSeries,weekTracks,cars,isLive,FLB_enable
            }
   else:
     try:
-      db_createEvent(eventName,eventSeries,weekTracks,w13,cars,isLive,altPwd,FLB_enabled) 
+      db_createEvent(eventName,eventSeries,weekTracks,w13,cars,isLive,altPwd,FLB_enabled, HCB_enabled) 
       return { 
                'result'  : True,
                'message' : "Event Created"

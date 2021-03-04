@@ -259,6 +259,8 @@ def addAdditionalConfig():
     fh.write('version:' + installVersion + "\n")
     fh.write('#Bonus Points For Fast Lap Bonus\n')
     fh.write('fastLapBonusAmount:10\n')
+    fh.write('#Bonus Points For Hard Charger Bonus\n')
+    fh.write('hardChargerBonusAmount:5\n')    
     fh.close()
 
 
