@@ -586,8 +586,8 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
     else:
       ##HTML for counted week   
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      if (fastLapEnabled and row <= len(eventFastLabTimes)) or (str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
-        if fastLap == eventFastLabTimes[row][1] and (str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
+      if (fastLapEnabled and row <= len(eventFastLabTimes)):
+        if fastLap == eventFastLabTimes[row][1] and (hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap and Hard Charge Bonuses Applied For This Week"><i class="fab fa-reddit-alien"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -617,7 +617,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"     
-        elif str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
+        elif hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -648,19 +648,35 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"  
       else:
-        scheduleHtml = scheduleHtml + "<tr>"  
-        scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
-        if chgReq == '1' and position != '' and userNum.strip() == curUserNum.strip(): 
-          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
-        elif position != '' and userNum.strip() == curUserNum.strip():
-          scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
+        if hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
+          scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
+          scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and userNum.strip() == curUserNum.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and userNum.strip() == curUserNum.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"  
         else:
-          scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
-        scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
-        scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
-        scheduleHtml = scheduleHtml + "</tr>"   
+          scheduleHtml = scheduleHtml + "<tr>"  
+          scheduleHtml = scheduleHtml + "<td>" + week     + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
+          if chgReq == '1' and position != '' and userNum.strip() == curUserNum.strip(): 
+            scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Score modification pending approval"><i class="fas fa-sync"></i></a>  ' + week + '</td>'
+          elif position != '' and userNum.strip() == curUserNum.strip():
+            scheduleHtml = scheduleHtml + '<td><i class="far fa-edit" onClick="startScoreModify(' + eventNum + ',' + userNum + ',' + week + ');" ></i>  ' + position + '</td>'
+          else:
+            scheduleHtml = scheduleHtml + '<td>' + position + '</td>'
+          scheduleHtml = scheduleHtml + "<td>" + startPos   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + points   + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
+          scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
+          scheduleHtml = scheduleHtml + "</tr>"   
 
   return scheduleHtml
