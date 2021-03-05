@@ -466,7 +466,7 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventTopPo
         userHC       = db_pullEventTopPosDifForUser(eventNum,userNum,roPwd)
         retiredWeeks = []
         usrWeek      = 1
-        while usrWeek < 9:
+        while usrWeek <= len(userHC) and usrWeek < 9:
           weekPosGain = userHC[usrWeek-1][1]
           for i in range(len(eventTopPosDif)):
             try:
@@ -586,8 +586,8 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
     else:
       ##HTML for counted week   
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      if (fastLapEnabled and row <= len(eventFastLabTimes)):
-        if fastLap == eventFastLabTimes[row][1] and (hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
+      if (fastLapEnabled and row < len(eventFastLabTimes)):
+        if fastLap == eventFastLabTimes[row][1] and (hardChargEnabled and row < len(eventTopPosDif) and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap and Hard Charge Bonuses Applied For This Week"><i class="fab fa-reddit-alien"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -617,7 +617,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"     
-        elif hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
+        elif hardChargEnabled and row < len(eventTopPosDif) and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -648,7 +648,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"  
       else:
-        if hardChargEnabled and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
+        if hardChargEnabled and row < len(eventTopPosDif) and str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
