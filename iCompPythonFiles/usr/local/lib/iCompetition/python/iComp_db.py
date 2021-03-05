@@ -253,7 +253,7 @@ def db_logScore(userName,eventNum,wkNum,pos,pnt,inc,lap,qual,diff,rights):
 def db_getEventBaseInfo(eventNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select name, series, enableFastLapBonus, enabledHardChargerBonus from event where eventNum = " + str(eventNum) + ";")
+  cr.execute("select name, series, enableFastLapBonus, enableHardChargerBonus from event where eventNum = " + str(eventNum) + ";")
   results = cr.fetchone()
   _dbClose(db,cr)
   return results
@@ -287,7 +287,7 @@ def db_pullEventFastLapsForUser(eventNum,userNum,rights):
 def db_pullEventTopPosDifForUser(eventNum,userNum,rights):
   db = _dbConnect("read",rights)
   cr = db.cursor()  
-  cr.execute("select week, min(posGain) from scoring where eventNum = " + str(eventNum) + " and userNum = " + str(userNum) + " group by week order by week;")
+  cr.execute("select week, max(posGain) from scoring where eventNum = " + str(eventNum) + " and userNum = " + str(userNum) + " group by week order by points desc;")
   results = cr.fetchall()
   _dbClose(db,cr)
   return results  
@@ -326,7 +326,7 @@ def db_pullEventUserRank(eventNum,rights):
 
 def db_pullScheduleResults(eventNum,userNum,rights):
   scheduleQuery = """
-    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested, sc.fastLap, sc.qualPosition, sc.posGainposGain
+    select sch.week, sch.track, ifnull(sc.position,''), ifnull(sc.points,''), ifnull(sc.inc,''), sc.changeRequested, sc.fastLap, sc.qualPosition, sc.posGain
       from schedule sch 
         left join scoring sc 
           on sch.week = sc.week

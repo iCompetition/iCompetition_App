@@ -419,7 +419,8 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventTopPo
   ## if numbers match , add 10 points to tmpPoing.append for the week
   for row in range(len(rankingResults)):
     tmpPoints  = []
-    bonus      = 0
+    flBonus    = 0
+    hcBonus    = 0
     userNum    = rankingResults[row][0]
     userFirst  = rankingResults[row][1]
     userLast   = rankingResults[row][2]
@@ -445,36 +446,43 @@ def _generate_eventDetailRankingHtml(rankingResults,eventFastLabTimes,eventTopPo
       else:
         pass
 
-      if fastLapEnabled or hardChargEnabled:
-        bonus = 0
-        if fastLapEnabled:
-          userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
-          for i in range(len(eventFastLabTimes)):
-            for j in range(len(userFL)):
-              try:
-                if eventFastLabTimes[i][1] == userFL[i][1]:
-                  if i < 9:
-                    bonus = bonus + fastLapBonus
-                    break
-                  else:
-                    pass
-              except IndexError:
-                pass
-        if hardChargEnabled:
-          userHC = db_pullEventTopPosDifForUser(eventNum,userNum,roPwd)
+      if fastLapEnabled:
+        flBonus = 0
+        userFL = db_pullEventFastLapsForUser(eventNum,userNum,roPwd)
+        for i in range(len(eventFastLabTimes)):
+          for j in range(len(userFL)):
+            try:
+              if eventFastLabTimes[i][1] == userFL[i][1]:
+                if i < 9:
+                  flBonus = flBonus + fastLapBonus
+                  break
+                else:
+                  pass
+            except IndexError:
+              pass
+
+      if hardChargEnabled:
+        hcBonus      = 0
+        userHC       = db_pullEventTopPosDifForUser(eventNum,userNum,roPwd)
+        retiredWeeks = []
+        usrWeek      = 1
+        while usrWeek < 9:
+          weekPosGain = userHC[usrWeek-1][1]
           for i in range(len(eventTopPosDif)):
-            for j in range(len(userHC)):
-              try:
-                if eventFastLabTimes[i][1] == userHC[i][1]:
-                  if i < 9:
-                    bonus = bonus + hardChargBonus
-                    break
-                  else:
-                    pass
-              except IndexError:
-                pass              
-      pointSum = sum(tmpPoints) + bonus
+            try:
+              if str(eventTopPosDif[i][1]) == str(weekPosGain) and str(weekPosGain) != "0" and str(weekPosGain) != "None" and i not in retiredWeeks:
+                hcBonus = hcBonus + hardChargBonus
+                retiredWeeks.append(i)
+                break
+              else:
+                pass
+            except IndexError:
+              pass
+          usrWeek = usrWeek + 1
+      
+      pointSum = sum(tmpPoints) + flBonus + hcBonus
       rankingInfo.append([pointSum,userFirst + "|" + userLast + "|" + userCar])
+
   rankingInfo.sort(reverse=True)
 
   rankingHTML = "<tr>"
@@ -515,6 +523,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
   scheduleHtml = scheduleHtml + "<th>Week</th>"
   scheduleHtml = scheduleHtml + "<th>Track</th>"
   scheduleHtml = scheduleHtml + "<th>Position</th>"
+  scheduleHtml = scheduleHtml + "<th>Started</th>"
   scheduleHtml = scheduleHtml + "<th>Points</th>"
   scheduleHtml = scheduleHtml + "<th>Inc</th>"
   scheduleHtml = scheduleHtml + "<th>Fast Lap</th>"
@@ -575,10 +584,10 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
       scheduleHtml = scheduleHtml + "</tr>"    
       del droppedWk[droppedWk.index(points)]
     else:
-      ##HTML for counted week
+      ##HTML for counted week   
       ## setup for if FLB is enabled, check fastLap against the fast time for week [i]
-      if (fastLapEnabled and row < len(eventFastLabTimes)) or (hardChargEnabled and row < len(eventTopPosDif)):
-        if fastLap == eventFastLabTimes[row][1] and posGain == eventTopPosDif[row][1]:
+      if (fastLapEnabled and row <= len(eventFastLabTimes)) or (str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
+        if fastLap == eventFastLabTimes[row][1] and (str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None"):
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Fastest Lap and Hard Charge Bonuses Applied For This Week"><i class="fab fa-reddit-alien"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
@@ -608,7 +617,7 @@ def _generate_eventDetailScheduleHtml(scheduleResults,eventFastLabTimes,eventTop
           scheduleHtml = scheduleHtml + "<td>" + inc      + "</td>"
           scheduleHtml = scheduleHtml + "<td>" + fastLap_reformed      + "</td>"
           scheduleHtml = scheduleHtml + "</tr>"     
-        elif posGain == eventTopPosDif[row][1]:
+        elif str(posGain) == str(eventTopPosDif[row][1]) and str(posGain) != "0" and str(posGain) != "None":
           scheduleHtml = scheduleHtml + "<tr class='highlight_green'>"  
           scheduleHtml = scheduleHtml + '<td><a href="#" data-toggle="tooltip" title="Hard Charge Bonus Applied For This Week"><i class="fas fa-tachometer-alt"></i></a>  ' + week + '</td>'
           scheduleHtml = scheduleHtml + "<td>" + track    + "</td>"
