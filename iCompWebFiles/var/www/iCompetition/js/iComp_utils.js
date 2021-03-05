@@ -104,7 +104,8 @@ function randomFactoid(){
                 "Better luck next week",
                 "iRace, iCrash, iCry",
                 "Thank you for using iCompetition.  We know you don't have other choices and we welcome you to mediocrity",
-                "Michael > LeBron"
+                "Michael > LeBron",
+                "\"Hard Charger\"....sounds kind of dirty when you think about it"
                 ]
   pullIndex  = Math.floor(Math.random() * phrase.length);
   document.getElementById("randomText").innerHTML = phrase[pullIndex];
