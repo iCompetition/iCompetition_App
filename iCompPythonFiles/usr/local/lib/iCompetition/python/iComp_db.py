@@ -424,7 +424,7 @@ def db_getUserInfoForAdmin(userName, rights):
 
 def db_getResultsForWeek(event,user,week,rights):
   query = """
-  select u.username, e.name as eventName, sch.track, sc.points, sc.position, sc.inc, sc.fastLap
+  select u.username, e.name as eventName, sch.track, sc.points, sc.position, sc.inc, sc.fastLap, sc.qualPosition
   from users u
   join scoring sc 
     on u.userNum = sc.userNum
@@ -451,11 +451,12 @@ def db_getResultsForWeek(event,user,week,rights):
           'points'    : results[0][3],
           'position'  : results[0][4],
           'inc'       : results[0][5],
-          'lap'       : results[0][6]
+          'lap'       : results[0][6],
+          'qualify'   : results[0][7]
          }
 
 
-def db_addChangeReqToDB(event,user,week,pnt,pos,inc,cPnt,cPos,cInc,fl,ofl,rights):
+def db_addChangeReqToDB(event,user,week,pnt,pos,inc,cPnt,cPos,cInc,fl,ofl,cQual,nQual,rights):
   
   reqNum = 0  
   userName = ""
@@ -486,8 +487,10 @@ def db_addChangeReqToDB(event,user,week,pnt,pos,inc,cPnt,cPos,cInc,fl,ofl,rights
                         """ + str(pos)      + """,
                         """ + str(event)    + """,
                         """ + str(week)     + """,
-                        '""" + str(ofl)       + """',
-                        '""" + str(fl)      + """');
+                        '""" + str(ofl)     + """',
+                        '""" + str(fl)      + """',
+                        """   + str(cQual)  + """,
+                        """   + str(nQual)  + """);
   """  
   cr.execute(insertQuery)
   cr.execute("update scoring set changeRequested = 1 where eventNum = " + str(event) + " and userNum = " + str(user) + " and week = " + str(week) + ";")
@@ -510,7 +513,9 @@ def db_getChgReqList(rights):
                  eventNum,
                  week,
                  curFastLap,
-                 newFastLap                 
+                 newFastLap,
+                 curQualPos,
+                 newQualPos                 
           from requestedChanges
           order by reqNum
           """
@@ -533,18 +538,22 @@ def db_approveChgReq(reqNum, rights):
                  newPoints,
                  newPosition,
                  newInc,
-                 newFastLap
+                 newFastLap,
+                 newQualPos
           from requestedChanges
           where reqNum = """ + str(reqNum) + """;"""
           
   cr.execute(query1)
   chgResults = cr.fetchall()
+  posGain = chgResults[0][7] - chgResults[0][4]
   query2 = """
          update scoring
-         set points = """    + str(chgResults[0][3]) + """,
-             position = """  + str(chgResults[0][4]) + """,
-             inc = """       + str(chgResults[0][5]) + """,
-             fastLap = '"""   + str(chgResults[0][6]) + """',
+         set points = """         + str(chgResults[0][3]) + """,
+             position = """       + str(chgResults[0][4]) + """,
+             inc = """            + str(chgResults[0][5]) + """,
+             fastLap = '"""       + str(chgResults[0][6]) + """',
+             qualPosition = """   + str(chgResults[0][7]) + """,
+             posGain = """        + str(posGain) + """,
              changeRequested = 0
          where userNum = """ + str(chgResults[0][0]) + """
          and eventNum = """  + str(chgResults[0][1]) + """

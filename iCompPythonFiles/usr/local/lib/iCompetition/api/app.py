@@ -521,7 +521,8 @@ def addChangeReq():
   pos         = parser['pos']
   inc         = parser['inc']
   lap         = parser['lap']
-  makeRequest = set_eventWeekModifyTrue(event,user,week,pnt,pos,inc,lap,token,roPwd,altPwd)
+  qual        = parser['qual']
+  makeRequest = set_eventWeekModifyTrue(event,user,week,pnt,pos,inc,lap,qual,token,roPwd,altPwd)
   return json.dumps(makeRequest) 
       
 @app.route('/iComp/event/modify/getList', methods=['GET'])

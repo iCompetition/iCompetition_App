@@ -37,6 +37,7 @@ def get_preModifiedEventDetails(userNum,eventNum,weekNum,token,roPwd):
     position
     inc  
     lap
+    qual
   """
   eventModFuncLog.info("get_preModifiedEventDetails - checking auth token")
   if not validateToken(token):
@@ -73,7 +74,7 @@ def get_changeRequests(roPwd):
             'html'      : None
            }
   else:
-    htmlStr = '<tr> <th>REQ NUM</th> <th>EVT NUM</th> <th>WK NUM</th> <th>USR NUM</th> <th>USR NAME</th> <th>PNT CHG</th> <th>POS CHG</th> <th>INC CHG</th> <th>FLAP CHG</th> <th>ACTION</th> </tr>'
+    htmlStr = '<tr> <th>REQ NUM</th> <th>EVT NUM</th> <th>WK NUM</th> <th>USR NUM</th> <th>USR NAME</th> <th>PNT CHG</th> <th>POS CHG</th> <th>INC CHG</th> <th>FLAP CHG</th> <th>QUAL CHG</th> <th>ACTION</th> </tr>'
     for i in range(len(chgList)):
       htmlStr = htmlStr + '<tr>\n'
       htmlStr = htmlStr + '<td>' + str(chgList[i][0]) + '</td>\n'
@@ -86,6 +87,7 @@ def get_changeRequests(roPwd):
       htmlStr = htmlStr + '<td>' + str(chgList[i][5]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][8]) + "</td>\n"
       htmlStr = htmlStr + '<td>' + str(chgList[i][5]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][8]) + "</td>\n"
       htmlStr = htmlStr + '<td>' + str(chgList[i][11]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][12]) + "</td>\n"
+      htmlStr = htmlStr + '<td>' + str(chgList[i][13]) + '<i class="fas fa-arrow-right"></i>' + str(chgList[i][14]) + "</td>\n"
       htmlStr = htmlStr + '<td><i class="far fa-check-square mr-2" data-toggle="tooltop" data-placement="top" title="Approve Change" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',true)" ; ></i> <i class="far fa-times-circle mr-2" data-toggle="tooltop" data-placement="top" title="Approve Change" onClick="actOnChangeChg(' + str(chgList[i][0]) + ',false)"; ></i></td>\n'
       htmlStr = htmlStr + '</tr>\n'  
     return {
@@ -94,7 +96,7 @@ def get_changeRequests(roPwd):
            }      
 
 
-def set_eventWeekModifyTrue(eventNum,userNum,weekNum,points,position,incidents,fastLap,token,roPwd,altPwd):
+def set_eventWeekModifyTrue(eventNum,userNum,weekNum,points,position,incidents,fastLap,qualify,token,roPwd,altPwd):
   """
   create new change request for week scores
   INPUT
@@ -123,7 +125,7 @@ def set_eventWeekModifyTrue(eventNum,userNum,weekNum,points,position,incidents,f
       eventModFuncLog.info("get_preModifiedEventDetails - pulling current week scores")
       oldResults = db_getResultsForWeek(eventNum,userNum,weekNum,roPwd)
       eventModFuncLog.info("get_preModifiedEventDetails - adding modification request to DB")
-      cReq = db_addChangeReqToDB(eventNum,userNum,weekNum,points,position,incidents,oldResults['points'],oldResults['position'],oldResults['inc'],fastLap, oldResults['lap'],altPwd)
+      cReq = db_addChangeReqToDB(eventNum,userNum,weekNum,points,position,incidents,oldResults['points'],oldResults['position'],oldResults['inc'],fastLap, oldResults['lap'],qualify,oldResults['qualify'],altPwd)
       return {
                'success' : cReq,
                'message' : 'modification request entered'

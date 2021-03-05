@@ -240,6 +240,7 @@ function startScoreModify(eventNum,userNum,week){
   ms_curinc     = document.getElementById("ms_curinc");
   ms_curlap     = document.getElementById("ms_curlap");
   ms_newPos     = document.getElementById("ms_position");
+  ms_newQual    = document.getElementById("ms_qualify");
   ms_newPnt     = document.getElementById("ms_points");
   ms_newinc     = document.getElementById("ms_inc");
   ms_newlap     = document.getElementById("ms_lap");
@@ -254,10 +255,12 @@ function startScoreModify(eventNum,userNum,week){
     ms_eventTitle.innerHTML = response.eventName
     ms_weekTitle.innerHTML  = response.track
     ms_curPos.innerHTML     = response.position
+    ms_curQual.innerHTML    = response.qualify
     ms_curPnt.innerHTML     = response.points
     ms_curinc.innerHTML     = response.inc
     ms_curlap.innerHTML     = response.lap
     ms_newPos.disabled      = false;
+    ms_newQual.disabled     = false;
     ms_newPnt.disabled      = false;
     ms_newinc.disabled      = false;
     ms_newlap.disabled      = false;
@@ -274,11 +277,13 @@ function startScoreModify(eventNum,userNum,week){
 
 function reqScoreChange(){
   ms_newPos     = document.getElementById("ms_position");
+  ms_newQual    = document.getElementById("ms_qualify");
   ms_newPnt     = document.getElementById("ms_points");
   ms_newinc     = document.getElementById("ms_inc");
   
   newPnt   = ms_newPnt.value;
   newPos   = ms_newPos.value;
+  newQual  = ms_newQual.value;
   newInc   = ms_newinc.value;
   newLap   = ms_newlap.value;
   eventNum = getCookie('tmp_reqChg_eventNum');
@@ -286,7 +291,7 @@ function reqScoreChange(){
   weekNum  = getCookie('tmp_reqChg_wkNum');
   
   const call = new XMLHttpRequest(),
-  url = apiAddress + "iComp/event/modify/reqChange?token=" + getCookie("auth") + "&eventNum=" + eventNum + "&userNum=" + userNum + "&week=" + weekNum + "&pnt=" + newPnt+ "&pos=" + newPos + "&inc=" + newInc + "&lap=" + newLap;
+  url = apiAddress + "iComp/event/modify/reqChange?token=" + getCookie("auth") + "&eventNum=" + eventNum + "&userNum=" + userNum + "&week=" + weekNum + "&pnt=" + newPnt+ "&pos=" + newPos + "&inc=" + newInc + "&lap=" + newLap + "&qual=" + newQual;
   call.open("GET",url,false);
   call.send(null);
   response = JSON.parse(call.responseText);    
@@ -301,10 +306,12 @@ function reqScoreChange(){
   deleteCookie('tmp_reqChg_userNum');
   deleteCookie('tmp_reqChg_wkNum');
   ms_newPos.value    = '';
+  ms_newQual.value    = '';
   ms_newPnt.value    = '';
   ms_newinc.value    = '';
   ms_newlap.value    = '';
   ms_newPos.disabled = true;
+  ms_newQual.disabled = true;
   ms_newPnt.disabled = true;
   ms_newinc.disabled = true;
   ms_newlap.disabled = true;  
