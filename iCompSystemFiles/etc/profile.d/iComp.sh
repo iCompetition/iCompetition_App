@@ -6,6 +6,7 @@ alias iCompApi-showLogs='ls -la /var/log/iComp/'
 #App Commands
 alias iComp-version='python3 /usr/local/lib/iCompetition/python/scripts/displayICompVersion.py'
 alias iComp-modifyUserAdmin='python3 /usr/local/lib/iCompetition/python/scripts/adminFlag.py'
+alias iComp-chgDbPwd='python3 /usr/local/lib/iCompetition/python/scripts/databasePasswordUtil.py'
 alias iComp-deleteInstall='python3 /usr/local/lib/iCompetition/iComp_delete.py'
 #Navigation Comands
 alias iCompGo-install='cd /usr/local/lib/iCompetition'

@@ -179,14 +179,24 @@ def buildApacheConf():
     fh.write("\tCustomLog ${APACHE_LOG_DIR}/access.log combined\n")
     fh.write("</VirtualHost>")
     fh.close()
+    if httpsOn.upper() == "Y":
+        return True
+    else:
+        return False
 
 
-def buildJSSharedVars():
+def buildJSSharedVars(httpsOn):
     global domain
     global httpsPort
         
     domain    = input("What is your public facing url for this server?:  ")
-    httpsPort = input("What is your public facing https port for this server?:  ")
+    if domain[:8].lower() == "https://" or domain[:7].lower() == "http://"
+      if httpsOn:
+          domain = "https://" + domain
+    else:
+          domain = "http://" + domain
+
+    httpsPort = input("What is your public facing web port for this server?:  ")
     apiPort   = input("What is your public facing api port for this server?:  ")
     fh = open("./iCompWebFiles/var/www/iCompetition/js/iComp_sharedVars.js",'w')
     fh.write("htmlAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
@@ -280,8 +290,8 @@ def changeLoginPageImage():
 def main():
     CheckPrereq()
     makeiCompDirs()
-    buildApacheConf()
-    buildJSSharedVars()
+    httpsOn = buildApacheConf()
+    buildJSSharedVars(httpsOn)
     copyFiles()
     getDbInfo()
     getEmailConf()
