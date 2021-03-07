@@ -46,7 +46,7 @@ def get_iCompUserList(admToken,roPwd):
     userCount    = len(userList)
     userListHtml = "<tr><th>UserName</th><th>UserNum</th></tr>"
     for row in range(len(userList)):
-      html = html + "<tr><td>" + userList[row][0] + "</td><td>" + str(userList[row][1]) + "</td></tr>"  
+      userListHtml = userListHtml + "<tr><td>" + userList[row][0] + "</td><td>" + str(userList[row][1]) + "</td></tr>"  
   
     return {
              'result'       : True,
