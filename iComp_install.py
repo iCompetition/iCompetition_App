@@ -190,7 +190,7 @@ def buildJSSharedVars(httpsOn):
     global httpsPort
         
     domain    = input("What is your public facing url for this server?:  ")
-    if domain[:8].lower() == "https://" or domain[:7].lower() == "http://"
+    if domain[:8].lower() == "https://" or domain[:7].lower() == "http://":
       if httpsOn:
           domain = "https://" + domain
     else:
