@@ -1,0 +1,14 @@
+[Unit]
+Description=iCompetition-API
+After=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/lib/iCompetition/api
+ExecStart=gunicorn -c iCompGunicornConf.py --certfile=/etc/letsencrypt/live/toastysilverfish.site/fullchain.pem --keyfile=/etc/letsencrypt/live/toastysilverfish.site/privkey.pem -b 0.0.0.0:5000 app:app
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

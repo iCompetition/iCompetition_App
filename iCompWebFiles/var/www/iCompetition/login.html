@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Metadata Goes Here -->
+  <title>iComp</title>
+  <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <!--Font Awesome download links-->
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script> <!--Old, might be able to remove-->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"> <!--current for v5-->
+  <!--end Font Awesome download links-->
+  <link rel="stylesheet" type="text/css" href="css/iComp.css">
+  <script type="text/javascript" src="js/iComp_sharedVars.js"></script>
+  <script type="text/javascript" src="js/iComp_utils.js"></script>  
+  <script type="text/javascript" src="js/iComp_cookies.js"></script>
+  <script type="text/javascript" src="js/iComp_user.js"></script>
+</head>
+<body>
+  <div class="alert alert-primary alert-dismissible fade show d-none" role="alert" id="dismissibleAlertInfo">
+    <strong id="disAlertInfoMes" >Template</strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="alert alert-warning alert-dismissible fade show d-none" role="alert" id="dismissibleAlertWarn">
+    <strong id="disAlertWarnMes" >Template</strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form onSubmit="userLogin(); return false;" action="" method="post">
+    <div class="text-center mt-5">
+      <i id='randomText' >Kidney stones are tough to pass</i>
+      <div>
+        <img src="images/loginPageImage" alt="Avatar" class="helmet">
+      </div>
+      <div class="alert alert-danger d-none" role="alert" id="alertbox" >
+        Template
+      </div>      
+      <div class="form-group m-auto w-50">
+        <input type="text" id="login_uName" placeholder="Enter Username" name="uname" required class="form-control w-50 mt-1 mx-auto">
+        <input type="password" id="login_pwd" placeholder="Enter Password" name="psw" required class="form-control w-50 mt-1 mx-auto">
+        <button type="submit" class="mt-2 mb-3 btn btn-outline-primary btn-lg w-50">Login</button>
+       </div>
+       <a href="register.html" class="border-right border-primary p-1" >Create Account</a>
+       <a href="forgotPass.html" class="border-left border-primary p-1" >Forgot Password?</a>
+    </div>  
+  </form>
+
+<span id='versionTooltip' class="d-inline-block" tabindex="0" data-toggle="tooltip" title="">
+  <div class='fixed-bottom m-2' ><a href="./updatelog.html" rel="noopener noreferrer" target="_blank"><i class="fas fa-code-branch"></i></a></div>
+</span>
+  <script>
+    getVersionInfo();
+    iCompServerCheck();
+  </script>
+<!--  END OF BODY -->
+</body>
+</html>

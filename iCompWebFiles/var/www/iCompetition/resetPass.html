@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Metadata Goes Here -->
+  <title>iComp</title>
+  <link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/iComp.css">
+  <script type="text/javascript" src="js/iComp_sharedVars.js"></script>
+  <script type="text/javascript" src="js/iComp_utils.js"></script>  
+  <script type="text/javascript" src="js/iComp_cookies.js"></script>
+  <script type="text/javascript" src="js/iComp_user.js"></script>
+</head>
+<body>
+  <form onSubmit="resetPasswordForUser(); return false;" action="" method="post">
+    <div class="text-center mt-5">
+      <div>
+        <img src="images/helmetLogo.jpg" alt="Avatar" class="helmet">
+      </div>
+      <div class="alert alert-danger d-none" role="alert" id="alertbox" >
+        Template
+      </div>
+      <div class="alert alert-primary d-none" role="alert" id="alertbox2" >
+        Template
+      </div>
+      <div class="form-group m-auto w-50 d-none" id="pwdResetForm" >
+        <b id="unholder" >Change Password For User:&nbsp;&nbsp;<i id="pwdResetUserName">template</i></b>
+        <input type="password" id="pwdReset_one" placeholder="Enter New Password" name="pwd1" required class="form-control w-50 mt-1 mx-auto">
+        <input type="password" id="pwdReset_two" placeholder="Confirm New Password" name="pwd2" required class="form-control w-50 mt-1 mx-auto">
+        <button type="submit" class="mt-2 mb-3 btn btn-outline-primary btn-lg w-50" id="rpassbut" >Change Password</button>
+        <button onClick="checkUser();" class="mt-2 mb-3 btn btn-outline-primary btn-lg w-50 d-none" id="returnToLogin">Login</button>
+       </div>
+    </div>  
+  </form>
+
+<!--  END OF BODY -->
+  <script>
+    validatePassResetLink();
+  </script>
+</body>
+</html>
