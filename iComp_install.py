@@ -193,8 +193,10 @@ def buildJSSharedVars(httpsOn):
     if domain[:8].lower() == "https://" or domain[:7].lower() == "http://":
       if httpsOn:
           domain = "https://" + domain
-    else:
+      else:
           domain = "http://" + domain
+    else:
+        pass
 
     httpsPort = input("What is your public facing web port for this server?:  ")
     apiPort   = input("What is your public facing api port for this server?:  ")
