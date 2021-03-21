@@ -12,7 +12,7 @@ import getpass
 import errno
 
 ##Variables
-installVersion = '0.02.00'
+installVersion = '0.02.01'
 dirsToCreate   = [
                  '/usr/local/lib/iCompetition/api',
                  '/usr/local/lib/iCompetition/python',
