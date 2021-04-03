@@ -12,9 +12,11 @@ import getpass
 import errno
 
 ##Variables
-installVersion = '0.02.01'
+installVersion  = '0.02.01'
+dbSchemaVersion = '0.02'
 dirsToCreate   = [
                  '/usr/local/lib/iCompetition/api',
+                 '/usr/local/lib/iCompetition/dbSchema',
                  '/usr/local/lib/iCompetition/python',
                  '/usr/local/lib/iCompetition/python/crypt',
                  '/usr/local/lib/iCompetition/python/scripts',
@@ -208,6 +210,7 @@ def buildJSSharedVars(httpsOn):
 def copyFiles():
     sys.stdout.write('\nCopying files to system\n')
     os.popen('cp ./iCompPythonFiles/usr/local/lib/iCompetition/api/* /usr/local/lib/iCompetition/api/')
+    os.popen('cp ./iCompDatabaseSchema/* /usr/local/lib/iCompetition/dbSchema')
     os.popen('cp -r ./iCompPythonFiles/usr/local/lib/iCompetition/python/* /usr/local/lib/iCompetition/python/')
     os.popen('cp -r ./iCompWebFiles/var/www/iCompetition/* /var/www/iCompetition/')
     os.popen('cp ./iCompWebFiles/etc/apache2/sites-available/iComp.conf /etc/apache2/sites-available/iComp.conf')
@@ -236,6 +239,7 @@ def getDbInfo():
     fh.write('database_location:' + dblocation + '\n')
     fh.write('database_port:' + dbport + '\n')
     fh.write('database_name:' + dbname + '\n')
+    fh.write('database_minimumSchema:' + dbSchemaVersion + '\n')
     fh.close()
 
     pwdRO = iencrypt(roUser)
@@ -303,7 +307,7 @@ def main():
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')
     sys.stdout.write('\t - If this is a brand new installation of iComp, ensure you have completed the DB build.\n')
-    sys.stdout.write('\t\t - See iComp_DB repository\n')
+    sys.stdout.write('\t\t - See iCompSchemaReadMe\n')
     sys.stdout.write('\t - The iCompApi can be started and stopped with iCompApi-up and iCompApi-down commands (You may need to log out and in first) or by using systemctl\n')
     sys.stdout.write('\t - ensure ports 8001 and 5000 are open on this server.  Ensure database ports are open if database exists on this server.\n')
 

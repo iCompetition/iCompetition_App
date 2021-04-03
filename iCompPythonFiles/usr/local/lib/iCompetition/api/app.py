@@ -78,10 +78,11 @@ roPwd  = idecrypt(getCred("iCompRead"))
 altPwd = idecrypt(getCred("iCompAlt"))
 #3) CHECK DATABASE SCHEMA VERSION
 dbSchema = db_schemaVersion(roPwd)
-majorVer = confDict['version'].split('.')[0] + '.' +confDict['version'].split('.')[1]
+# majorVer = confDict['version'].split('.')[0] + '.' +confDict['version'].split('.')[1]
+db_minSchemaVersion = confDict['database_minimumSchema']
 apiLog.info("DBSchema Version: " + str(dbSchema))
-if  majorVer != dbSchema:
-  apiLog.error("DB Schema does not match the feature set version of iCompetition.  Please Update DB Schema to version " + majorVer)
+if  db_minSchemaVersion != dbSchema:
+  apiLog.error("DB Schema does not match the minimum required schema verison for this verion of iCompetition.  Please Update DB Schema to version " + db_minSchemaVersion)
   sys.exit(0)
 else:
   pass
