@@ -221,6 +221,7 @@ def copyFiles():
     os.popen('systemctl restart apache2')
     os.popen('systemctl daemon-reload')
     os.popen('systemctl enable iCompApi')
+    os.popen('systemctl stop iCompApi')
 
 
 def getDbInfo():
