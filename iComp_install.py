@@ -31,6 +31,8 @@ dirsToCreate   = [
                  ]
 domain    = ""
 httpsPort = ""
+cert      = ""
+key       = ""
 
 
 def CheckPrereq():
@@ -154,6 +156,8 @@ def makeiCompDirs():
 
 
 def buildApacheConf():
+    global cert
+    global key
     sys.stdout.write("\nHTTPS Info\n")
     httpsOn = ""
     certLoc = ""
@@ -181,6 +185,10 @@ def buildApacheConf():
     fh.write("\tCustomLog ${APACHE_LOG_DIR}/access.log combined\n")
     fh.write("</VirtualHost>")
     fh.close()
+
+    cert = certLoc
+    key  = keyLoc
+
     if httpsOn.upper() == "Y":
         return True
     else:
@@ -200,10 +208,11 @@ def buildJSSharedVars(httpsOn):
     else:
         pass
 
-    httpsPort = input("What is your public facing web port for this server?:  ")
+    # httpsPort = input("What is your public facing web port for this server?:  ")
     apiPort   = input("What is your public facing api port for this server?:  ")
     fh = open("./iCompWebFiles/var/www/iCompetition/js/iComp_sharedVars.js",'w')
-    fh.write("htmlAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
+    # fh.write("htmlAddress  = \"" + domain + ":" + httpsPort + "/\"\n")
+    fh.write("./" + "\n")
     fh.write("apiAddress = \"" + domain + ":" + apiPort + "/\"\n")
     fh.close()
 
@@ -216,12 +225,16 @@ def copyFiles():
     os.popen('cp ./iCompWebFiles/etc/apache2/sites-available/iComp.conf /etc/apache2/sites-available/iComp.conf')
     os.popen('cp ./iCompSystemFiles/etc/profile.d/iComp.sh /etc/profile.d/iComp.sh')
     os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompApi.service /etc/systemd/system/iCompApi.service')
+    os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompToken.service /etc/systemd/system/iCompToken.service')
+    os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompToken.timer /etc/systemd/system/iCompToken.timer')
     os.popen('cp ./iComp_delete.py /usr/local/lib/iCompetition/')
     os.popen('a2ensite iComp.conf')
     os.popen('systemctl restart apache2')
     os.popen('systemctl daemon-reload')
-    os.popen('systemctl enable iCompApi')
-    os.popen('systemctl stop iCompApi')
+    os.popen('systemctl enable iCompApi.service')
+    os.popen('systemctl enable iCompToken.timer')
+    os.popen('systemctl stop iCompApi.service')
+    os.popen('systemctl stop iCompToken.service')
 
 
 def getDbInfo():
@@ -281,6 +294,30 @@ def addAdditionalConfig():
     fh.close()
 
 
+def gunicornConfig():
+  workers = input("Please enter the number of gunicorn processes to run - blank is 2:  ")
+  if workers == "":
+    workers = 2
+  else:
+    pass
+
+  try:
+    int(workers)
+  except:
+    sys.stdout.write("Input must be int, workers will be set to default")
+    workers = 2
+
+  fh = open("/etc/iCompetition/iCompGunicornConf.py", 'w')
+  fh.write("accesslog = '/var/log/iComp/gunicorn.log'\n")
+  fh.write("errorlog = '/var/log/iComp/gunicorn.log'\n")
+  fh.write("certfile = '" + cert + "'\n")
+  fh.write("keyfile = '"  + key + "'\n")
+  fh.write("workers = "  + str(workers) + "\n")
+  fh.close()
+
+  os.symlink('/etc/iCompetition/iCompGunicornConf.py','/usr/local/lib/iCompetition/api/iCompGunicornConf.py')
+
+
 def changeLoginPageImage():
     confirmChange = input("Do you want to replace the login page logo image? (y/n):  ")
     if confirmChange.upper() == "Y":
@@ -304,6 +341,7 @@ def main():
     getEmailConf()
     addAdditionalConfig()
     changeLoginPageImage()
+    gunicornConfig()
     sys.stdout.write('\n\n')
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')

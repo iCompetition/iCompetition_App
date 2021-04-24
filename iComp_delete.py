@@ -26,8 +26,12 @@ if confirm == "delete icomp":
   except FileNotFoundError:
       pass  
   try: 
-      os.popen('systemctl stop iCompApi')
-      os.remove('/etc/systemd/system/iCompApt.service')
+      os.popen('systemctl stop iCompApi.service')
+      os.popen('systemctl stop iCompToken.service')
+      os.popen('systemctl stop iCompToken.timer')
+      os.remove('/etc/systemd/system/iCompApi.service')
+      os.remove('/etc/systemd/system/iCompToken.service')
+      os.remove('/etc/systemd/system/iCompToken.timer')
       call = subprocess.call('systemctl daemon-reload',shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
   except FileNotFoundError:
       pass

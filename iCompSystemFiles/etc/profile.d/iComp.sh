@@ -1,18 +1,21 @@
 #API Commands
-alias iCompApi-up='systemctl start iCompApi'
-alias iCompApi-down='systemctl stop iCompApi'
-alias iCompApi-stat='systemctl status iCompApi'
-alias iCompApi-showLogs='ls -la /var/log/iComp/'
+alias iComp-apiUp='systemctl start iCompApi.service && systemctl start iCompToken.timer'
+alias iComp-apiDown='systemctl stop iCompApi.service && systemctl stop iCompToken.service && systemctl stop iCompToken.timer'
+alias iComp-apiStatus='systemctl status iCompApi.service && systemctl status iCompToken.timer'
 #App Commands
 alias iComp-version='python3 /usr/local/lib/iCompetition/python/scripts/displayICompVersion.py'
 alias iComp-modifyUserAdmin='python3 /usr/local/lib/iCompetition/python/scripts/adminFlag.py'
 alias iComp-chgDbPwd='python3 /usr/local/lib/iCompetition/python/scripts/databasePasswordUtil.py'
 alias iComp-deleteInstall='python3 /usr/local/lib/iCompetition/iComp_delete.py'
+alias iComp-checkForUpdate='python3 /usr/local/lib/iCompetition/python/scripts/updater.py listVersions'
+alias iComp-updateToVersion='python3 /usr/local/lib/iCompetition/python/scripts/updater.py update --version'
 #Navigation Comands
-alias iCompGo-install='cd /usr/local/lib/iCompetition'
-alias iCompGo-config='cd /etc/iCompetition'
-alias iCompGo-web='cd /var/www/iCompetition/'
-alias iCompGo-log='cd /var/log/iComp/'
+alias iComp-goToInstall='cd /usr/local/lib/iCompetition'
+alias iComp-gotoConfig='cd /etc/iCompetition'
+alias iComp-gotoWeb='cd /var/www/iCompetition/'
+alias iComp-gotoLog='cd /var/log/iComp/'
 #Web Commands
-alias iCompWeb-changeLoginImage="python3 /usr/local/lib/iCompetition/python/scripts/changeLoginPageImage.py"
-
+alias iComp-changeLoginImage="python3 /usr/local/lib/iCompetition/python/scripts/changeLoginPageImage.py"
+#Util Commands
+alias iComp-showLogs='ls -la /var/log/iComp/'
+alias iComp-purgeExpiredTokens='python3 /usr/local/lib/iCompetition/python/scripts/tokenCleanup.py'

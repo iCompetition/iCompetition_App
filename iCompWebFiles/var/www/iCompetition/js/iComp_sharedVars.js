@@ -1,2 +1,2 @@
 apiAddress  = "" 
-htmlAddress = ""
+htmlAddress = "./"

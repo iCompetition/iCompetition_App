@@ -1,18 +1,21 @@
 #!/usr/bin/python3
+import argparse
+import requests
 
-##displays version information to console.  provides app version and pulls version for db schema
+##Version api check command
+##get list
+#requests.get('https://api.github.com/repos/iCompetition/iCompetition_App/releases',verify=False)
 
-import sys 
-sys.path.append("/usr/local/lib/iCompetition/python")
-sys.path.append("/usr/local/lib/iCompetition/python/crypt")
-from iComp_util import getConf
-from iComp_db import db_schemaVersion
-from iComp_util import *
-from credManagement import *
-outFmt = ("{:25s}: {}\n")
-roPwd = idecrypt(getCred("iCompRead"))
-schema = db_schemaVersion(roPwd)
-sys.stdout.write("\n")
-sys.stdout.write(outFmt.format("iCompetition App Version", getConf()['version']))
-sys.stdout.write(outFmt.format("iCompeition DB Version", str(schema)))
-sys.stdout.write("\n")
+##output list
+#for i in range(len(t.json())):
+#  print(t.json()[i].get('tag_name)
+
+##updater script for iComp version
+def getArguments():
+  parser = parser = argparse.ArgumentParser(description='Changes image for login page')
+  parser.add_argument('func',help="update / listVersions")
+  parser.add_argument('--version',default='NONE',help="delete existing image.  false by deault",)
+  return parser.parse_args()
+
+
+

@@ -1,0 +1,12 @@
+[Unit]
+Description=iCompetition-Token-Manager
+
+[Service]
+Type=oneshot
+WorkingDirectory=/usr/local/lib/iCompetition/python/scripts
+ExecStart=python3 tokenCleanup.py
+StandardOutput=inherit
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
