@@ -225,7 +225,7 @@ def copyFiles():
     os.popen('cp -r ./iCompWebFiles/var/www/iCompetition/* /var/www/iCompetition/')
     os.popen('cp ./iCompWebFiles/var/www/iCompetition/admin.html /usr/local/lib/iCompetition/templateHold/admin.html')
     os.popen('cp ./iCompWebFiles/var/www/iCompetition/index.html /usr/local/lib/iCompetition/templateHold/index.html')
-    os.popen('cp ./iCompWebFiles/var/www/iCompetition/index.html /usr/local/lib/iCompetition/templateHold/index_maintenance.html')
+    os.popen('cp ./iCompWebFiles/var/www/iCompetition/index_maintenance.html /usr/local/lib/iCompetition/templateHold/index_maintenance.html')
     os.popen('cp ./iCompWebFiles/etc/apache2/sites-available/iComp.conf /etc/apache2/sites-available/iComp.conf')
     os.popen('cp ./iCompSystemFiles/etc/profile.d/iComp.sh /etc/profile.d/iComp.sh')
     os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompApi.service /etc/systemd/system/iCompApi.service')
