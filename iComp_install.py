@@ -23,6 +23,7 @@ dirsToCreate   = [
                  '/usr/local/lib/iCompetition/.tokens',
                  '/usr/local/lib/iCompetition/.tokens/.adm',
                  '/usr/local/lib/iCompetition/.tokens/.pwd',
+                 '/usr/local/lib/iCompetition/templateHold',
                  '/etc/iCompetition/.creds',
                  '/var/www/iCompetition/css',
                  '/var/www/iCompetition/js',
@@ -222,6 +223,9 @@ def copyFiles():
     os.popen('cp ./iCompDatabaseSchema/* /usr/local/lib/iCompetition/dbSchema')
     os.popen('cp -r ./iCompPythonFiles/usr/local/lib/iCompetition/python/* /usr/local/lib/iCompetition/python/')
     os.popen('cp -r ./iCompWebFiles/var/www/iCompetition/* /var/www/iCompetition/')
+    os.popen('cp ./iCompWebFiles/var/www/iCompetition/admin.html /usr/local/lib/iCompetition/templateHold/admin.html')
+    os.popen('cp ./iCompWebFiles/var/www/iCompetition/index.html /usr/local/lib/iCompetition/templateHold/index.html')
+    os.popen('cp ./iCompWebFiles/var/www/iCompetition/index.html /usr/local/lib/iCompetition/templateHold/index_maintenance.html')
     os.popen('cp ./iCompWebFiles/etc/apache2/sites-available/iComp.conf /etc/apache2/sites-available/iComp.conf')
     os.popen('cp ./iCompSystemFiles/etc/profile.d/iComp.sh /etc/profile.d/iComp.sh')
     os.popen('cp ./iCompSystemFiles/etc/systemd/system/iCompApi.service /etc/systemd/system/iCompApi.service')
@@ -331,6 +335,16 @@ def changeLoginPageImage():
         sys.stdout.write("You can change the image later by running iCompWeb-changeLoginImage\n")
 
 
+def enableAdminWebPage():
+    confirmChange = input("Do you want to enable the main admin web page? (y/n):  ")
+    if confirmChange.upper() == "Y":
+        pass
+    else:
+        if os.path.exists('/var/www/iCompetition/admin.html'):
+            os.remove('/var/www/iCompetition/admin.html')
+            sys.stdout.write("This can be reenabled at a later time\n")
+
+
 def main():
     CheckPrereq()
     makeiCompDirs()
@@ -342,6 +356,7 @@ def main():
     addAdditionalConfig()
     changeLoginPageImage()
     gunicornConfig()
+    enableAdminWebPage()
     sys.stdout.write('\n\n')
     sys.stdout.write('iCompetition ' + installVersion + ' web application is now installed!\n')
     sys.stdout.write('A few notes: - \n')

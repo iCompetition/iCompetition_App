@@ -32,7 +32,7 @@ def getArguments():
 def alterPass(user,password):
   try:
     pwd = iencrypt(password)
-    fh = open('/etc/iCompetition/.creds/.' + username,'wb')
+    fh = open('/etc/iCompetition/.creds/.' + user,'wb')
     fh.write(pwd)
     fh.close() 
     return True

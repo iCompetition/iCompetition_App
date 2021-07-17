@@ -19,3 +19,7 @@ alias iComp-changeLoginImage="python3 /usr/local/lib/iCompetition/python/scripts
 #Util Commands
 alias iComp-showLogs='ls -la /var/log/iComp/'
 alias iComp-purgeExpiredTokens='python3 /usr/local/lib/iCompetition/python/scripts/tokenCleanup.py'
+##Funciton Commands
+alias iComp-function-enable='python3 /usr/local/lib/iCompetition/python/scripts/functionEnablement.py enable'
+alias iComp-function-disable='python3 /usr/local/lib/iCompetition/python/scripts/functionEnablement.py disable'
+alias iComp-function-status='python3 /usr/local/lib/iCompetition/python/scripts/functionEnablement.py status'
