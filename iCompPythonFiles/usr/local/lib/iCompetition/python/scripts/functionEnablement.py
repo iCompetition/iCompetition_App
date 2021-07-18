@@ -4,6 +4,7 @@
 
 import argparse
 import os
+from posix import EX_CANTCREAT
 import sys
 import logging
 import logging.handlers
@@ -65,7 +66,37 @@ def adminMainWebPage(action):
 
 def maintenanceWeb(action):
   ##handles the availability of the index.html
-
+  if action.lower() == "status":
+    if os.path.exists('/var/www/iCompetition/maint.txt'):
+      sys.stdout.write("enabled\n")
+    else:
+      sys.stdout.write("disabled\n")
+  elif action.lower() == "enable":
+    if os.path.exists('/var/www/iCompetition/maint.txt'):
+      sys.stdout.write("already enabled\n")
+    else:
+      try:
+        os.popen('cp /usr/local/lib/iCompetition/templateHold/index_maintenance.html /var/www/iCompetition/index.html')
+        os.popen('cp /usr/local/lib/iCompetition/templateHold/index_maintenance.html /var/www/iCompetition/maint.txt')
+        adminFuncLog.info("web maintence mode has been enabled\n")
+        sys.stdout.write("enabled\n")
+      except Exception as e:
+        adminFuncLog.info("there was an attempt to enable web maintence mode, but it failed\n")
+        adminFuncLog.error(str(e))
+        sys.stdout.write("failed to enable\n")
+        sys.stdout.write(str(e) + "\n")
+  elif action.lower() == "disable":
+    if os.path.exists('/var/www/iCompetition/maint.txt'):
+      try:
+        os.remove('/var/www/iCompetition/maint.txt')
+        os.popen('cp /usr/local/lib/iCompetition/templateHold/index.html /var/www/iCompetition/index.html')
+        adminFuncLog.info("web maintence mode has been disabled\n")
+        sys.stdout.write("disabled\n")        
+      except Exception as e:
+        adminFuncLog.info("there was an attempt to disable web maintence mode, but it failed\n")
+        adminFuncLog.error(str(e))
+        sys.stdout.write("failed to disable\n")
+        sys.stdout.write(str(e) + "\n")        
 
 
 def main():
