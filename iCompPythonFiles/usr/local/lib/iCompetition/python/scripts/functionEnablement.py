@@ -4,7 +4,6 @@
 
 import argparse
 import os
-from posix import EX_CANTCREAT
 import sys
 import logging
 import logging.handlers
