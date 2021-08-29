@@ -12,6 +12,8 @@ import hashlib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from simplecrypt import encrypt, decrypt
+import requests
+import warnings
 
 
 ##Variables
@@ -210,3 +212,37 @@ def idecrypt(pwd):
 
 def dbHasher(pwd):
   return hashlib.md5(pwd.encode('utf-8')).hexdigest()
+
+
+def list_iCompVersionsInGit():
+  '''
+  Check github repo for all releases
+  returns List[Strings]
+  '''
+  ##Supress Warning(s)
+  warnings.filterwarnings('ignore','InsecureRequestWarning')  
+  gitVersions    = []
+  releaseUrl     = 'https://api.github.com/repos/iCompetition/iCompetition_App/releases'
+  releaseHead    = {'Accept':'application/vnd.github.v3+jaon'}
+  sslVerify      = False
+  releases       = (requests.get(releaseUrl,headers=releaseHead,verify=sslVerify)).json()
+  for i in range(len(releases)):
+    gitVersions.append(releases[i]['tag_name'].split('_')[1])
+  
+  return gitVersions
+
+
+def check_newReleaseInGit(gitVersions):
+  '''
+  Checks if git has higher release then current version
+  '''
+  currentVersion = getConf['version']
+  if currentVersion.strip() not in gitVersions:
+    return 'INVALID'
+  else:
+    if currentVersion.strip() != gitVersions[0].strip():
+      return 'A newer version of iCompetition is available: ' + gitVersions[0].strip()
+    else:
+      return 'CURRENT'
+
+
