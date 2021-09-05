@@ -61,7 +61,7 @@ def check_versionIsValid(version):
     return False
 
 
-def _download_versionZip(downloadVersion):
+def download_versionZip(downloadVersion):
   '''
   Directory will be places at:
   /tmp/iCompetition_updates/iCompetition_<version>/iCompetition_App-iCompetition_<version>
@@ -83,6 +83,22 @@ def _download_versionZip(downloadVersion):
     adminFuncLog.error("Failed to download new verion")
     adminFuncLog.error(str(e))
     return False
+
+
+def copy_applicationFiles(downloadVersion):
+  pythonPathDownload  = downloadDir + 'iCompetition_' + downloadVersion + 'iCompPythonFiles/usr/local/lib/iCompetition/python/'
+  apiPathDownload     = downloadDir + 'iCompetition_' + downloadVersion + 'iCompPythonFiles/usr/local/lib/iCompetition/api/'
+  webPathDownload     = downloadDir + 'iCompetition_' + downloadVersion + 'iCompWebFiles/etc/apache2/sites-available/'
+  webConfPathDownload = downloadDir + 'iCompetition_' + downloadVersion + 'iCompWebFiles/var/www/iCompetition/'
+  profilePathDownload = downloadDir + 'iCompetition_' + downloadVersion + 'iCompSystemFiles/etc/profile.d/'
+  sysdPathDownload    = downloadDir + 'iCompetition_' + downloadVersion + 'iCompSystemFiles/etc/systemd/'
+  pythonAppPathBase   = '/usr/local/lib/iCompetition/'
+  WebAppPathBase      = '/var/www/iCompetition/'
+  apacheConfDirect    = '/etc/apache2/sites-available'
+  iCompConfDirect     = '/etc/iCompetition/'
+  profileDirect       = '/etc/profile.d/'
+  sysdDirect          = '/etc/systemd/system/'
+
 
   
 
